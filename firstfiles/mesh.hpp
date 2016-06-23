@@ -521,7 +521,7 @@ Mesh::testfill(){
   tris = new tri[num_tris];
   edges = new edge[num_edges];
 
-  for(node=0; node<test.num_points; node++){
+  for(node=0; node<num_points; node++){
     points[node] = ((double)(node%5),(double)(node/5));
   }
 
@@ -556,6 +556,54 @@ Mesh::testfill(){
   edges[15]=(15,10);
   edges[16]=(10,5);
   edges[17]=(5,0);
+}
+
+Mesh::mass_matrix(double(*Rho)(Vector2d), &massMat){
+
+	//Filling the xieta array and weight array that will be used in this guassian
+	//	integration where the first point in xieta is xi and the second is eta
+	Vector2d * xieta = new Vector2d[4];
+	xieta[0] = (1./3., 1./3.);
+	xieta[1] = (1./5., 1./5.);
+	xieta[2] = (1./5., 3./5.);
+	xieta[3] = (3./5., 1./5.);
+
+	double * weight = new double[4];
+	weight[0] = -27./48.;
+	weight[1] = 25./48.;
+	weight[2] = 25./48.;
+	weight[3] = 25./48.;
+
+	double * v = {(1./3., 3./5., 1./5., 1./5.),
+								(1./3., 1./5., 1./5., 3./5.),
+								(1./3., 1./5., 3./5., 1./5.)}
+
+	int ii, jj, kk;
+	double nodeElement;
+
+	for(int t=0; t<num_tris; t++){
+		ii = tris[t].i;
+		jj = tris[t].j;
+		kk = tris[t].k;
+
+		Vector2d p0 = points[ii];
+		Vector2d p1 = points[jj];
+		Vector2d p2 = points[kk];
+
+		FromRefTri RefTri(p0, p1, p2);
+		nodeElement = 0;
+		for(int i=0; i<3; i++){
+			for(int k=0; k<3; k++){
+				for(int k=0; k<4; k++){
+					nodeElement += weight[k] * Rho(RefTri(xieta[k])) * v[i][k] * v[j][k];
+				}
+			}
+		}
+		massMat.coeffRef(i,j) += nodeElement * RefTri.jac()
+	}
+
+	free(xieta);
+	free(weight);
 }
 
 #endif /* JW_FE_MESH */
