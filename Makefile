@@ -28,10 +28,15 @@ CFLAGS += -O0 -ggdb
 CXXFLAGS = -Wall
 CXXFLAGS += -O0 -ggdb
 
-# Set the inclusion and library path 
-INCFLAGS = -I/opt/local/include
-INCFLAGS += -I/opt/local/include/eigen3
-LDFLAGS = -L/opt/local/lib
+# Set the inclusion and library path
+#INCFLAGS = -I/opt/local/include
+#INCFLAGS += -I/opt/local/include/eigen3
+INCFLAGS = -I/usr/include
+INCFLAGS += -I/usr/include/eigen3
+INCFLAGS += -I/usr/local/include
+#LDFLAGS = -L/opt/local/lib
+LDFLAGS = -L/usr/lib
+LDFLAGS += -L/usr/local/lib
 
 # Set the libraries to link to
 LIBS = -lm
@@ -48,7 +53,7 @@ $(PROGRAM): $(OBJS)
 	$(CXX) $(LDFLAGS) $(LIBS) $^ -o $@
 
 # Include the dependencies
-# This has all of the additional dependencies 
+# This has all of the additional dependencies
 # for building the source files to object files.
 # See the comment below for more detail.
 ifneq ($(strip $(DEPS)),)
@@ -78,4 +83,3 @@ test:
 
 clean:
 	rm -f *.o *.dep $(PROGRAM)
-

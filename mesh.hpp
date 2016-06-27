@@ -34,7 +34,7 @@ struct tri{
 		}
 		 return -1;
 	};
-}
+};
 /* An 'edge' struct that holds two integer indices */
 /* the indices mark the end-points of an edge in a larger array of points */
 struct edge{
@@ -48,7 +48,7 @@ struct edge{
 		}
 		return -1;
 	};
-}
+};
 
 /*
  * Mesh class:
@@ -85,8 +85,8 @@ public:
 	void to_triangulateio( triangulateio *out);
 	void reorder_nodes( int);
 	double integrate( double(*)(Vector2d));
-	void mass_matrix( double(*)(Vector2d), &SparseMatrix);
-	void stiffness_matrix( double(*)(Vector2d), &SparseMatrix);
+	void mass_matrix( double(*)(Vector2d), SparseMatrix<double, RowMajor, int> &);
+	void stiffness_matrix( double(*)(Vector2d), SparseMatrix<double, RowMajor, int> &);
 
 	//methods created for reorder_nodes
 	tri Find_tri(int, int);

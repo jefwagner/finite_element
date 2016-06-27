@@ -19,12 +19,14 @@
 #  > void print_status( int status, string func_name);
 #
 # This file will:
-# 1. Generate all neccessary dependencies to compile all test_*.cpp 
+# 1. Generate all neccessary dependencies to compile all test_*.cpp
 #    files
 # 2. Compile all test_*.cpp and other neccessary files to object files
 # 3. Create a test_main.cpp that calls all test_*() functions, then
 #    Compile and link the program.
 #######################################################################
+from __future__ import print_function
+
 import sys
 from glob import glob
 import os
@@ -52,12 +54,12 @@ def read_compiler_flags():
     """Read the compiler flags from the makefile"""
     f = open('Makefile','r')
     flags = {
-    'CC' : '', 
-    'CXX' : '', 
-    'CFLAGS' : '', 
-    'CXXFLAGS' : '', 
-    'INCFLAGS' : '', 
-    'LDFLAGS' : '', 
+    'CC' : '',
+    'CXX' : '',
+    'CFLAGS' : '',
+    'CXXFLAGS' : '',
+    'INCFLAGS' : '',
+    'LDFLAGS' : '',
     'LIBS' : ''}
     for line in f:
         words = [ word.strip() for word in line.split('+=')]
@@ -179,7 +181,7 @@ test_files =  glob('test_*.cpp')
 # Start and empty list of test functions
 test_functions = []
 for file in test_files:
-    # For each file get a list of dependecies in a Makefile rule using 
+    # For each file get a list of dependecies in a Makefile rule using
     # the -MM compiler flag
     target, deps = get_build_deps(file)
     # Go through the dependecies to see if this will depend on any
@@ -231,4 +233,3 @@ run_test()
 print()
 print('Successfully compiled and ran test.')
 clean_test_files()
-

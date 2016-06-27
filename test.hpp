@@ -1,7 +1,10 @@
+#ifndef JW_FE_TEST
+#define JW_FE_TEST
+
 #include <iostream>
 #include <string>
 
-int print_status( int status, std::string s){
+static int print_status( int status, const char *s){
 	if( status){
 		std::cout << " + " << s << " Passes." << std::endl;
 		return 0;
@@ -10,3 +13,5 @@ int print_status( int status, std::string s){
 		return 1;
 	}
 }
+
+#endif /* JW_FE_TEST */
