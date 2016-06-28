@@ -76,8 +76,8 @@ def read_compiler_flags():
 #
 def get_build_deps(file):
     """Use the -MM compiler flag to get a list of dependencies"""
-    cmd_string = '{} -MM {} {} {}'.format(
-        flags['CXX'],flags['CXXFLAGS'],flags['INCFLAGS'],file)
+    cmd_string = '{} -MM {}'.format(
+        flags['CXX'],file)
     proc = Popen(shlex.split(cmd_string),stdout=PIPE, stderr=PIPE)
     (stdoutdata,stderrdata) = proc.communicate()
     rule = stdoutdata.decode('utf-8')
@@ -142,7 +142,7 @@ def run_test():
         print()
         print(stdoutdata.decode('utf-8'))
         print(stderrdata.decode('utf-8'))
-        clean_test_files()
+#        clean_test_files()
         sys.exit()
     else:
         print(stdoutdata.decode('utf-8'))
@@ -205,13 +205,14 @@ for file in test_files:
 for src in extra_srcs:
     recompile = True
     obj, deps = get_build_deps(src)
+#    print( 'src : {}'.format(src))
     dep_times = [getmtime(dep) for dep in deps]
     if isfile(obj):
         obj_time = getmtime(obj)
         if obj_time > max(dep_times):
             recompile = False
-    if recomp:
-        compile_file(src, obj)
+    if recompile:
+        compile_file(flags, src, obj)
 # Create the test__main.cpp file
 prototypes = ['void '+func+'();' for func in test_functions]
 prototypes = '\n'.join(prototypes)

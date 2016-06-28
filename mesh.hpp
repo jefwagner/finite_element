@@ -4,6 +4,7 @@
 #include <vector> // Vectors from the standard library
 
 #include <Eigen/Core> // The Vector2d data type
+
 #include <Eigen/SparseCore> // The SparseMatrix data type
 
 #include "triangle.hpp" // The triangulateio data type
@@ -20,31 +21,25 @@ using namespace std;
 /* the indices mark the corners of the triangle in a larger array of points */
 struct tri{
 	int i,j,k;
-	int operator[](int l){
-		if( l == 0){
-			return i;
-		}
+	int& operator[](int l){
 		if( l == 1 ){
 			return j;
 		}
 		if( l == 2 ){
 			return k;
 		}
-		 return -1;
+		return i;
 	};
 };
 /* An 'edge' struct that holds two integer indices */
 /* the indices mark the end-points of an edge in a larger array of points */
 struct edge{
 	int i,j;
-	int operator[](int l){
-		if( l == 0){
-			return i;
-		}
+	int& operator[](int l){
 		if( l == 1){
 			return j;
 		}
-		return -1;
+		return i;
 	};
 };
 
@@ -82,25 +77,26 @@ public:
 
 	void to_triangulateio( triangulateio *out);
 	void reorder_nodes( int);
-	double integrate( double(*)(Vector2d));
-	void mass_matrix( double(*)(Vector2d), SparseMatrix<double, RowMajor, int> &);
-	void stiffness_matrix( double(*)(Vector2d), SparseMatrix<double, RowMajor, int> &);
+	double integrate( double(*func)(Vector2d));
+	void mass_matrix( double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &);
+	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double, RowMajor, int> &);
 
 	//methods created for reorder_nodes
-	tri Find_tri(int, int);
+	tri find_tri(int, int);
 	tri find_edge(int, int);
-	void updateArrBuilder(int, int *);
+	void update_arr_builder(int, int *);
 	void add_without_duplicating(int *, int);
-	int Find_negative(int *);
-	int FirstNonNegative(int *);
-	void updateArrays(int *);
+	int find_negative(int *);
+	int first_non_negative(int *);
+	void update_arrays(int *);
 	void swap_tri(int, int);
 	void swap_edge(int, int);
-	void triFinalForm();
-	void edgeFinalForm();
+	void tri_final_form();
+	void edge_final_form();
 
 	//test functions
-	void testfill();
-}
+	void test_fill();
+	Vector2d points_get(int);
+};
 
 #endif /* JW_FE_MESH */
