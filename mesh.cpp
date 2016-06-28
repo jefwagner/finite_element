@@ -1,6 +1,6 @@
 #include "mesh.hpp"
 #include "utils.hpp"
-#include <stdio.h>
+#include <iostream>
 
 //Constructor => fills data in Mesh, assuming triangle has already run
 
@@ -138,7 +138,7 @@ int Mesh::find_negative(int *arr){
 		}
 	}
 
-	return k-1;
+	return -1;
 }
 
 //Add without duplicating
@@ -146,23 +146,24 @@ void Mesh::add_without_duplicating(int arr[], int n){
 	int p;
 	bool count = true;
 
-	for(p=0; (p<num_points) || (arr[p] != -1); p++){
+
+
+	for(p=0; (p<num_points) && (arr[p] != -1); p++){
 		if(arr[p] == n){                            //Check for double count
 			count = false;
 			break;
 		}
-		if(p+1 == num_points){                      //Check for hitting the end
+		if(p == num_points-1){                      //Check for hitting the end
 			count = false;
 		}
 	}
-
 	if(count){                                     //If none of the checks above
 		arr[find_negative(arr)] = n;                 //come up positive add element
-		printf("added one \n");
+		cout << arr[find_negative(arr)] << endl << std::flush;
 	}
 }
 
-//triangle search function
+//triangle search function                          To debug must return a list of triangles that n is apart of
 int Mesh::find_tri(int n) {
 	int j;
 	int k;
@@ -205,7 +206,7 @@ void Mesh::update_arr_builder(int n, int update_arr[]){
 	int k;
 
 	for(k=0; k<3; k++){
-		if((tris[location][k] != n) || (tris[location][k] != -1)){
+		if((tris[location][k] != n) && (tris[location][k] != -1)){
 			add_without_duplicating(update_arr, tris[location][k]);
 		}
 	}
@@ -319,12 +320,16 @@ void Mesh::reorder_nodes(int n){
 
 
 	//Actual search for nodes as described in notebook pg 49
-	while(end != num_points){
+	while(end != -1){
 		for(i=start; i<end; i++){
+			cout << start << endl << std::flush;
+			cout << end << endl << std::flush;
 			update_arr_builder(i,update_arr);
 		}
 		start = end;
 		end = find_negative(update_arr);
+		cout << start << endl << std::flush;
+		cout << end << endl << std::flush;
 	}
 
 	//Wlll go through each cycle and change order of arrays
