@@ -1,7 +1,4 @@
-extern "C" {
-  #include "triangle.h"
-}
-
+#include "triangle.hpp"
 #include "test.hpp"
 #include "mesh.hpp"
 

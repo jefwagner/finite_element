@@ -6,9 +6,7 @@
 #include <Eigen/Core> // The Vector2d data type
 #include <Eigen/SparseCore> // The SparseMatrix data type
 
-extern "C" {
-	#include <triangle.h> // The triangulateio data type
-}
+#include "triangle.hpp" // The triangulateio data type
 
 using namespace Eigen;
 using namespace std;

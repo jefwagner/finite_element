@@ -2,7 +2,7 @@
 #define JW_FE_TRIANGLE
 
 extern "C" {
-	#include "triangle.h"
+	#include <triangle.h>
 };
 
 #endif
