@@ -1,5 +1,6 @@
 #include "mesh.hpp"
 #include "utils.hpp"
+#include <stdio.h>
 
 //Constructor => fills data in Mesh, assuming triangle has already run
 
@@ -137,15 +138,15 @@ int Mesh::find_negative(int *arr){
 		}
 	}
 
-	return -1;
+	return k-1;
 }
 
 //Add without duplicating
-void Mesh::add_without_duplicating(int *arr, int n){
+void Mesh::add_without_duplicating(int arr[], int n){
 	int p;
 	bool count = true;
 
-	for(p=0; p<num_points && arr[p] != -1; p++){
+	for(p=0; (p<num_points) || (arr[p] != -1); p++){
 		if(arr[p] == n){                            //Check for double count
 			count = false;
 			break;
@@ -156,29 +157,23 @@ void Mesh::add_without_duplicating(int *arr, int n){
 	}
 
 	if(count){                                     //If none of the checks above
-		arr[find_negative(arr)] = n;               //come up positive add element
+		arr[find_negative(arr)] = n;                 //come up positive add element
+		printf("added one \n");
 	}
 }
 
 //triangle search function
-tri Mesh::find_tri(int n, int i) {
+int Mesh::find_tri(int n) {
 	int j;
 	int k;
-	tri ret;
-	for(j=i+1; j<num_tris; j++){
+	for(j=0; j<num_tris; j++){
 		for(k=0; k<3; k++){
 			if(tris[j][k] == n){
-				ret.i = i;
-				ret.j = j;
-				ret.k = k;
-				return ret;
+				return j;
 			}
 		}
 	}
-	ret.i = -1;
-	ret.j = -1;
-	ret.k = -1;
-	return ret;
+	return -1;
 }
 
 //edge search function
@@ -204,18 +199,15 @@ tri Mesh::find_edge(int n, int i){
 }
 
 //Fills the update_arr array of the new order of elements
-void Mesh::update_arr_builder(int n, int *update_arr){
-	int i = 0;
-	while(i != -1){
-		tri location = find_tri(n, i);
-		int k;
+void Mesh::update_arr_builder(int n, int update_arr[]){
 
-		for(k=0; k<3; k++){
-			if(tris[location.i][k] != n){
-				add_without_duplicating(update_arr, tris[location.i][k]);
-			}
+	int location = find_tri(n);
+	int k;
+
+	for(k=0; k<3; k++){
+		if((tris[location][k] != n) || (tris[location][k] != -1)){
+			add_without_duplicating(update_arr, tris[location][k]);
 		}
-		i = location.i;
 	}
 }
 
@@ -269,10 +261,10 @@ void Mesh::swap_tri(int element, int replace){
 	int ret;
 
 	while(i != -1){
-		tri location = find_tri(element, i);
-		i = location.i;
-		j = location.j;
-		k = location.k;
+		int location = find_tri(element);
+		i = tris[location].i;
+		j = tris[location].j;
+		k = tris[location].k;
 		ret = (replace - num_points);
 		tris[j][k] = ret;
 	}

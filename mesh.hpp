@@ -82,7 +82,7 @@ public:
 	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double, RowMajor, int> &);
 
 	//methods created for reorder_nodes
-	tri find_tri(int, int);
+	int find_tri(int);
 	tri find_edge(int, int);
 	void update_arr_builder(int, int *);
 	void add_without_duplicating(int *, int);
