@@ -193,15 +193,12 @@ void test_reorder(){
 
   int count = 0;
 
-  Vector2d point = mesh_test.points_get(12);
+  Vector2d point = mesh_test.points_get(29);
 
   for(int p=0; p<30; p++){
     cout << mesh_test.points_get(p)[0] << "," << mesh_test.points_get(p)[1] << endl << std::flush;
 
   }
-
-  cout << point[0] << "," << point[1] << endl << std::flush;
-
   // for(int p=0; p<30; p++){
   //   cout << point[0] << "," << point[1] << endl << std::flush;
   // }
@@ -242,5 +239,5 @@ void test_reorder(){
     delete[] my_tio.edgelist;
   }
 
-  print_status( count==4, "reorder_nodes");
+  print_status( count==2, "reorder_nodes");
 }

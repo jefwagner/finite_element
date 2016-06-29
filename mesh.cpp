@@ -225,6 +225,13 @@ void Mesh::update_arrays(int *update_arr){
 	Vector2d final_val = points[final_i];
 	int element = final_i;
 	int replacement = update_arr[element];
+	int last_index;
+
+	for(int i=0; i<num_points; i++){
+		if(update_arr[i] == final_i){
+			last_index = i;
+		}
+	}
 
 	//The swapping and filling the array with -1 as it does so
 	while(replacement != -1){
@@ -239,9 +246,10 @@ void Mesh::update_arrays(int *update_arr){
 	}
 
 	//Sliding the first element back in and filling the update_arr with -1 in its place
-	points[element] = final_val;
-	swap_tri(element, final_i);
-	swap_edge(element, final_i);
+	points[last_index] = final_val;
+	cout << last_index << ":" << points[last_index][0] << ","<< points[last_index][1] << endl << "Next section" <<endl << std::flush;
+	swap_tri(last_index, final_i);
+	swap_edge(last_index, final_i);
 
 	update_arr[element] = -1;
 }
