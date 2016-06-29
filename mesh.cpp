@@ -1,5 +1,6 @@
 #include "mesh.hpp"
 #include "utils.hpp"
+#include <iostream>
 
 //Constructor => fills data in Mesh, assuming triangle has already run
 
@@ -141,44 +142,39 @@ int Mesh::find_negative(int *arr){
 }
 
 //Add without duplicating
-void Mesh::add_without_duplicating(int *arr, int n){
+void Mesh::add_without_duplicating(int arr[], int n){
 	int p;
 	bool count = true;
 
-	for(p=0; p<num_points && arr[p] != -1; p++){
+
+
+	for(p=0; (p<num_points) && (arr[p] != -1); p++){
 		if(arr[p] == n){                            //Check for double count
 			count = false;
 			break;
 		}
-		if(p+1 == num_points){                      //Check for hitting the end
+		if(p == num_points-1){                      //Check for hitting the end
 			count = false;
 		}
 	}
-
 	if(count){                                     //If none of the checks above
-		arr[find_negative(arr)] = n;               //come up positive add element
+		int index = find_negative(arr);
+		arr[index] = n;                 //come up positive add element
+		cout << arr[index] << endl
+							<< index << endl
+									<< n << endl << std::flush;
 	}
 }
 
 //triangle search function
-tri Mesh::find_tri(int n, int i) {
-	int j;
+int Mesh::find_tri(int n,int t) {
 	int k;
-	tri ret;
-	for(j=i+1; j<num_tris; j++){
-		for(k=0; k<3; k++){
-			if(tris[j][k] == n){
-				ret.i = i;
-				ret.j = j;
-				ret.k = k;
-				return ret;
-			}
+	for(k=0; k<3; k++){
+		if(tris[t][k] == n){
+			return t;
 		}
 	}
-	ret.i = -1;
-	ret.j = -1;
-	ret.k = -1;
-	return ret;
+	return -1;
 }
 
 //edge search function
@@ -204,18 +200,20 @@ tri Mesh::find_edge(int n, int i){
 }
 
 //Fills the update_arr array of the new order of elements
-void Mesh::update_arr_builder(int n, int *update_arr){
-	int i = 0;
-	while(i != -1){
-		tri location = find_tri(n, i);
-		int k;
+void Mesh::update_arr_builder(int n, int update_arr[]){
+	int t;
+	int location;
+	int k;
 
-		for(k=0; k<3; k++){
-			if(tris[location.i][k] != n){
-				add_without_duplicating(update_arr, tris[location.i][k]);
+	for(t=0; t<num_tris; t++){
+		location = find_tri(n, t);
+		if(location != -1){
+			for(k=0; k<3; k++){
+				if((tris[location][k] != n) && (tris[location][k] != -1)){
+					add_without_duplicating(update_arr, tris[location][k]);
+				}
 			}
 		}
-		i = location.i;
 	}
 }
 
@@ -267,14 +265,17 @@ void Mesh::swap_tri(int element, int replace){
 	int j;
 	int k;
 	int ret;
+	int t;
 
 	while(i != -1){
-		tri location = find_tri(element, i);
-		i = location.i;
-		j = location.j;
-		k = location.k;
-		ret = (replace - num_points);
-		tris[j][k] = ret;
+		for(t=0; t<num_tris; t++){
+			int location = find_tri(element, t);
+			i = tris[location].i;
+			j = tris[location].j;
+			k = tris[location].k;
+			ret = (replace - num_points);
+			tris[j][k] = ret;
+		}
 	}
 }
 
@@ -327,12 +328,18 @@ void Mesh::reorder_nodes(int n){
 
 
 	//Actual search for nodes as described in notebook pg 49
-	while(end != num_points){
+	while(end != -1){
 		for(i=start; i<end; i++){
 			update_arr_builder(i,update_arr);
 		}
 		start = end;
 		end = find_negative(update_arr);
+		cout << start << endl << std::flush;
+		cout << end << endl << std::flush;
+	}
+
+	for(int i=0; i<num_points; i++){
+		cout << update_arr[n] << endl;
 	}
 
 	//Wlll go through each cycle and change order of arrays
