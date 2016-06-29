@@ -49,15 +49,15 @@ Mesh::Mesh(triangulateio *in){
 
 Mesh::~Mesh(){
 	if(points != NULL){
-		delete[] points;
+		delete points;
 	}
 
 	if(tris != NULL){
-		delete[] tris;
+		delete tris;
 	}
 
 	if(edges != NULL){
-		delete[] edges;
+		delete edges;
 	}
 }
 
@@ -251,12 +251,10 @@ void Mesh::swap_tri(int element, int replace){
 	int i;
 	int t;
 
-	for(t=0; t<num_tris; t++){
-		int location = find_tri(element, t);
-		for(i=0; i<3; i++){
-			if(tris[location][i] == element){
-				tris[location][i] = replace;
-
+	for( t=0; i<num_tris; t++){
+		for( i=0; i<3; i++){
+			if(tris[t][i] == element){
+				tris[t][i] = -replace;
 			}
 		}
 	}
@@ -267,10 +265,9 @@ void Mesh::swap_edge(int element, int replace){
 	int e;
 
 	for(e=0; e<num_edges; e++){
-		int location = find_edge(element, e);
-		for(i=0; i<2; i++){
-			if(edges[location][i] == element){
-				edges[location][i] = replace;
+		for (i=0; i<2; i++){
+			if(edges[e][i] == element){
+				edges[e][i] = -replace;
 			}
 		}
 	}
@@ -321,7 +318,6 @@ void Mesh::reorder_nodes(int n){
 		}
 		start = end;
 		end = find_negative(update_arr);
-
 	}
 
 	//Wlll go through each cycle and change order of arrays
