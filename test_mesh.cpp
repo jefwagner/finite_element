@@ -105,37 +105,48 @@ void test_constructor(){
 
   print_status(integral == 17, "Integrate");
 
-  //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
-
-  mesh_test.reorder_nodes(12);
-
   //t e s t succeeds when the last 5 poinst have y value of 5
 
   int count = 0;
 
-  // Vector2d point = mesh_test.points_get(29);
-  //
-  // if(point[1] == 5){
-  //   count++;
-  // }
-  //
-  // print_status(count == 1, "reorder_nodes");
-  //
-  // //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
-  //
-  // mesh_test.reorder_nodes(17);
-  //
-  // //t e s t succeeds when the last 5 poinst have y value of 5
-  //
-  // count = 0;
-  //
-  // point = mesh_test.points_get(25);
-  //
-  // if(point[1] == 5){
-  //   count++;
-  // }
-  //
-  // print_status(count == 1, "reorder_nodes");
+  //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
+
+  mesh_test.reorder_nodes(12);
+
+  Vector2d point = mesh_test.points_get(29);
+
+  cout << point[0] << "," << point[1] << endl << std::flush;
+
+  if(point[1] == 5.){
+    count++;
+  }
+
+  if(point[0] == 0.){
+    count++;
+  }
+
+  print_status(count == 2, "reorder_nodes");
+
+  Mesh mesh_test1(&my_tio);
+
+  //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
+
+  mesh_test1.reorder_nodes(17);  //Node 17 before the reorder above
+
+  //t e s t succeeds when the last 5 poinst have y value of 5
+
+  count = 0;
+
+  point = mesh_test1.points_get(29);
+
+  cout << point[0] << "," << point[1] << endl << std::flush;
+
+  if(point[1] == 0.){
+    count++;
+  }
+  if(point[0] == 4.)
+
+  print_status(count == 2, "reorder_nodes1");
 
   //Clean up
 

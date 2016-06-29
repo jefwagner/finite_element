@@ -159,10 +159,7 @@ void Mesh::add_without_duplicating(int arr[], int n){
 	}
 	if(count){                                     //If none of the checks above
 		int index = find_negative(arr);
-		arr[index] = n;                 //come up positive add element
-		cout << arr[index] << endl
-							<< index << endl
-									<< n << endl << std::flush;
+		arr[index] = n;     						            //come up positive add element
 	}
 }
 
@@ -178,29 +175,19 @@ int Mesh::find_tri(int n,int t) {
 }
 
 //edge search function
-tri Mesh::find_edge(int n, int i){
-	int j;
+int Mesh::find_edge(int n, int e){
 	int k;
-	tri ret;
 
-	for(j=i+1; j<num_edges; j++){
-		for(k=0; k<2; k++){
-			if(edges[j][k] == n){
-				ret.i = j;
-				ret.j = j;
-				ret.k = k;
-				return ret;
-			}
+	for(k=0; k<2; k++){
+		if(edges[e][k] == n){
+			return e;
 		}
 	}
-	ret.i = -1;
-	ret.j =-1;
-	ret.k = -1;
-	return ret;
+	return -1;
 }
 
 //Fills the update_arr array of the new order of elements
-void Mesh::update_arr_builder(int n, int update_arr[]){
+void Mesh::update_arr_builder(int n, int * update_arr){
 	int t;
 	int location;
 	int k;
@@ -236,12 +223,11 @@ void Mesh::update_arrays(int *update_arr){
 	//Pulling an element out to do the swapping
 	int final_i = first_non_negative(update_arr);
 	Vector2d final_val = points[final_i];
-	int element;
-	int replacement;
+	int element = final_i;
+	int replacement = update_arr[element];
 
 	//The swapping and filling the array with -1 as it does so
-	while(element != -1){
-		replacement = update_arr[element];
+	while(replacement != -1){
 
 		points[element] = points[replacement];
 		swap_tri(element, replacement);
@@ -249,6 +235,7 @@ void Mesh::update_arrays(int *update_arr){
 
 		update_arr[element] = -1;
 		element = replacement;
+		replacement = update_arr[element];
 	}
 
 	//Sliding the first element back in and filling the update_arr with -1 in its place
@@ -261,33 +248,34 @@ void Mesh::update_arrays(int *update_arr){
 
 //Swaps all nodes that have the value element and replaces it wilh replace
 void Mesh::swap_tri(int element, int replace){
-	int i = 0;
-	int j;
-	int k;
-	int ret;
+	int i;
 	int t;
 
-	while(i != -1){
-		for(t=0; t<num_tris; t++){
-			int location = find_tri(element, t);
-			i = tris[location].i;
-			j = tris[location].j;
-			k = tris[location].k;
-			ret = (replace - num_points);
-			tris[j][k] = ret;
+	for(t=0; t<num_tris; t++){
+		int location = find_tri(element, t);
+		for(i=0; i<3; i++){
+			if(tris[location][i] == element){
+				tris[location][i] = replace;
+
+			}
 		}
 	}
 }
 
 void Mesh::swap_edge(int element, int replace){
-	int i = 0;
+	int i;
+	int e;
 
-	while(i != -1){
-		tri location = find_edge(element, i);
-		i = location.i;
-		tris[location.j][location.k] = replace - num_points;
+	for(e=0; e<num_edges; e++){
+		int location = find_edge(element, e);
+		for(i=0; i<2; i++){
+			if(edges[location][i] == element){
+				edges[location][i] = replace;
+			}
+		}
 	}
 }
+
 
 //Final Form of tris
 void Mesh::tri_final_form(){
@@ -326,20 +314,14 @@ void Mesh::reorder_nodes(int n){
 		update_arr[i] = -1;
 	}
 
-
 	//Actual search for nodes as described in notebook pg 49
-	while(end != -1){
+	while(start != (num_points-1)){
 		for(i=start; i<end; i++){
-			update_arr_builder(i,update_arr);
+			update_arr_builder(update_arr[i],update_arr);
 		}
 		start = end;
 		end = find_negative(update_arr);
-		cout << start << endl << std::flush;
-		cout << end << endl << std::flush;
-	}
 
-	for(int i=0; i<num_points; i++){
-		cout << update_arr[n] << endl;
 	}
 
 	//Wlll go through each cycle and change order of arrays
