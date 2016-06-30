@@ -231,10 +231,6 @@ void Mesh::update_arrays(int *update_arr){
 	//The swapping and filling the array with -1 as it does so
 	while(replacement != final_i){
 
-		// cout << points[element][0] << ", " << points[element][1] << endl << std::flush;
-		// cout << points[replacement][0] << ", " << points[replacement][1] << endl << std::flush;
-		points[element] = points[replacement];
-		cout << element << ":" << points[element][0] << ", " << points[element][1] << endl << std::flush;
 		swap_tri(element, replacement);
 		swap_edge(element, replacement);
 
@@ -244,10 +240,7 @@ void Mesh::update_arrays(int *update_arr){
 	}
 
 	//Sliding the first element back in and filling the update_arr with -1 in its place
-	// cout << points[element][0] << ", " << points[element][1] << endl << std::flush;
-	// cout << final_val[0] << ", " << final_val[1] << endl << std::flush;
 	points[element] = final_val;
-	cout << element << ":" << points[element][0] << ","<< points[element][1] << endl << "Next section" <<endl << std::flush;
 	swap_tri(element, final_i);
 	swap_edge(element, final_i);
 
@@ -264,7 +257,6 @@ void Mesh::swap_tri(int replace, int element){
 		for( i=0; i<3; i++){
 			if(tris[t][i] == element){
 				tris[t][i] = replace - num_points;
-				cout << element << " -> " << replace << endl << std::flush;
 			}
 		}
 	}
@@ -348,11 +340,6 @@ void Mesh::reorder_nodes(int n){
 		Vector2d p1 = points[j];
 		Vector2d p2 = points[k];
 
-		std::cout << "t: ";
-		std::cout << i << ": (" << p0(0) << "," << p0(1) << "), ";
-		std::cout << j << ": (" << p1(0) << "," << p1(1) << "), ";
-		std::cout << k << ": (" << p2(0) << "," << p2(1) << "), ";
-		std::cout << std::endl;
 	}
 	edge_final_form();
 }
@@ -398,19 +385,10 @@ double Mesh::integrate(double(*func)(Vector2d)){
 		p1 = points[j];
 		p2 = points[k];
 
-		// std::cout << "t: ";
-		// std::cout << "(" << p0(0) << "," << p0(1) << "), ";
-		// std::cout << "(" << p1(0) << "," << p1(1) << "), ";
-		// std::cout << "(" << p2(0) << "," << p2(1) << "), ";
-		// std::cout << std::endl;
-
 		FromRefTri xy(p0, p1, p2);
 		k_element = 0.;
 
 		for(kk=0; kk<4; kk++){
-			// std::cout << "p: ";
-			// std::cout << "(" << xy(xieta[kk])(0) << "," << xy(xieta[kk])(1) << "), ";
-			// std::cout << std::endl;
 			k_element += func(xy(xieta[kk]))*weight[kk];
 		}
 
