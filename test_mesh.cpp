@@ -173,3 +173,29 @@ void test_integrate(){
 
   print_status(integral == 100, "Integrate");
 }
+
+void test_massMatrix(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double, RowMajor, int> mass_mat_unordered;
+
+  mesh_test.mass_matrix(func, mass_mat_unordered);
+
+  /*
+  *The unordered SparseMatrix plot code
+  */
+
+  SparseMatrix<double, RowMajor, int> mass_mat_oredered;
+
+  mesh_test.reorder_nodes(12);
+
+  mesh_test.mass_matrix(func, mass_mat_oredered);
+
+  /*
+  *The ordered SparseMatrix plot code
+  */
+}
