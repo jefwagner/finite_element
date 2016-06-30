@@ -223,22 +223,18 @@ void Mesh::update_arrays(int *update_arr){
 	//Pulling an element out to do the swapping
 	int final_i = first_non_negative(update_arr);
 	Vector2d final_val = points[final_i];
+
 	int element = final_i;
 	int replacement = update_arr[element];
-	int last_index;
-
-	for(int i=0; i<num_points; i++){
-		if(update_arr[i] == final_i){
-			last_index = i;
-		}
-	}
 
 	//The swapping and filling the array with -1 as it does so
-	while(replacement != -1){
+	while(replacement != final_i){
 
 		points[element] = points[replacement];
 		swap_tri(element, replacement);
 		swap_edge(element, replacement);
+
+		cout << element << ":" << points[element][0] << ","<< points[element][1] << endl << std::flush;
 
 		update_arr[element] = -1;
 		element = replacement;
@@ -246,10 +242,10 @@ void Mesh::update_arrays(int *update_arr){
 	}
 
 	//Sliding the first element back in and filling the update_arr with -1 in its place
-	points[last_index] = final_val;
-	cout << last_index << ":" << points[last_index][0] << ","<< points[last_index][1] << endl << "Next section" <<endl << std::flush;
-	swap_tri(last_index, final_i);
-	swap_edge(last_index, final_i);
+	points[element] = final_val;
+	cout << element << ":" << points[element][0] << ","<< points[element][1] << endl << "Next section" <<endl << std::flush;
+	swap_tri(element, final_i);
+	swap_edge(element, final_i);
 
 	update_arr[element] = -1;
 }
@@ -259,10 +255,10 @@ void Mesh::swap_tri(int element, int replace){
 	int i;
 	int t;
 
-	for( t=0; i<num_tris; t++){
+	for( t=0; t<num_tris; t++){
 		for( i=0; i<3; i++){
 			if(tris[t][i] == element){
-				tris[t][i] = -replace;
+				tris[t][i] = replace - num_points;
 			}
 		}
 	}
@@ -275,7 +271,7 @@ void Mesh::swap_edge(int element, int replace){
 	for(e=0; e<num_edges; e++){
 		for (i=0; i<2; i++){
 			if(edges[e][i] == element){
-				edges[e][i] = -replace;
+				edges[e][i] = replace - num_points;
 			}
 		}
 	}
@@ -320,7 +316,7 @@ void Mesh::reorder_nodes(int n){
 	}
 
 	//Actual search for nodes as described in notebook pg 49
-	while(start != (num_points-1)){
+	while(end != -1){
 		for(i=start; i<end; i++){
 			update_arr_builder(update_arr[i],update_arr);
 		}
