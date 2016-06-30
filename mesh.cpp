@@ -1,6 +1,7 @@
 #include "mesh.hpp"
 #include "utils.hpp"
 #include <iostream>
+#include <cmath>
 
 //Constructor => fills data in Mesh, assuming triangle has already run
 
@@ -230,11 +231,12 @@ void Mesh::update_arrays(int *update_arr){
 	//The swapping and filling the array with -1 as it does so
 	while(replacement != final_i){
 
+		// cout << points[element][0] << ", " << points[element][1] << endl << std::flush;
+		// cout << points[replacement][0] << ", " << points[replacement][1] << endl << std::flush;
 		points[element] = points[replacement];
+		cout << element << ":" << points[element][0] << ", " << points[element][1] << endl << std::flush;
 		swap_tri(element, replacement);
 		swap_edge(element, replacement);
-
-		cout << element << ":" << points[element][0] << ","<< points[element][1] << endl << std::flush;
 
 		update_arr[element] = -1;
 		element = replacement;
@@ -242,6 +244,8 @@ void Mesh::update_arrays(int *update_arr){
 	}
 
 	//Sliding the first element back in and filling the update_arr with -1 in its place
+	// cout << points[element][0] << ", " << points[element][1] << endl << std::flush;
+	// cout << final_val[0] << ", " << final_val[1] << endl << std::flush;
 	points[element] = final_val;
 	cout << element << ":" << points[element][0] << ","<< points[element][1] << endl << "Next section" <<endl << std::flush;
 	swap_tri(element, final_i);
@@ -251,20 +255,22 @@ void Mesh::update_arrays(int *update_arr){
 }
 
 //Swaps all nodes that have the value element and replaces it wilh replace
-void Mesh::swap_tri(int element, int replace){
+void Mesh::swap_tri(int replace, int element){
 	int i;
 	int t;
+	int p;
 
-	for( t=0; t<num_tris; t++){
+	for(t=0; t<num_tris; t++){
 		for( i=0; i<3; i++){
 			if(tris[t][i] == element){
 				tris[t][i] = replace - num_points;
+				cout << element << " -> " << replace << endl << std::flush;
 			}
 		}
 	}
 }
 
-void Mesh::swap_edge(int element, int replace){
+void Mesh::swap_edge(int replace, int element){
 	int i;
 	int e;
 
@@ -332,6 +338,22 @@ void Mesh::reorder_nodes(int n){
 	delete[] update_arr;
 
 	tri_final_form();
+
+	for(int t=0; t<num_tris; t++){
+		int i = tris[t].i;
+		int j = tris[t].j;
+		int k = tris[t].k;
+
+		Vector2d p0 = points[i];
+		Vector2d p1 = points[j];
+		Vector2d p2 = points[k];
+
+		std::cout << "t: ";
+		std::cout << i << ": (" << p0(0) << "," << p0(1) << "), ";
+		std::cout << j << ": (" << p1(0) << "," << p1(1) << "), ";
+		std::cout << k << ": (" << p2(0) << "," << p2(1) << "), ";
+		std::cout << std::endl;
+	}
 	edge_final_form();
 }
 
@@ -355,17 +377,18 @@ double Mesh::integrate(double(*func)(Vector2d)){
 
 	//Filling the xieta array and weight array that will be used in this guassian
 	//	integration where the first point in xieta is xi and the second is eta
-	Vector2d xieta[4] = {
+	Vector2d xieta[] = {
 		Vector2d(1./3., 1./3.),
 		Vector2d(1./5., 1./5.),
 		Vector2d(1./5., 3./5.),
 		Vector2d(3./5., 1./5.)
 	};
 
-	double weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
+	double weight[] = {-27./48., 25./48., 25./48.,	25./48.};
 
 	//The actual sum, solving for the sum of each element and then summing over
 	//	all elements
+	all_elements = 0.;
 	for(l=0; l<num_tris; l++){
 		i = tris[l].i;
 		j = tris[l].j;
@@ -375,14 +398,23 @@ double Mesh::integrate(double(*func)(Vector2d)){
 		p1 = points[j];
 		p2 = points[k];
 
+		// std::cout << "t: ";
+		// std::cout << "(" << p0(0) << "," << p0(1) << "), ";
+		// std::cout << "(" << p1(0) << "," << p1(1) << "), ";
+		// std::cout << "(" << p2(0) << "," << p2(1) << "), ";
+		// std::cout << std::endl;
+
 		FromRefTri xy(p0, p1, p2);
-		k_element = 0;
+		k_element = 0.;
 
 		for(kk=0; kk<4; kk++){
-			k_element += func(xy(xieta[kk]))*weight[k];
+			// std::cout << "p: ";
+			// std::cout << "(" << xy(xieta[kk])(0) << "," << xy(xieta[kk])(1) << "), ";
+			// std::cout << std::endl;
+			k_element += func(xy(xieta[kk]))*weight[kk];
 		}
 
-		all_elements += k_element * xy.jac();
+		all_elements += 0.5 * k_element * std::abs(xy.jac());
 	}
 
 	return all_elements;
