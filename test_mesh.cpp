@@ -187,11 +187,14 @@ void test_massMatrix(){
 
   mesh_test.mass_matrix(func, mass_mat_unordered);
 
-  fstream unordered_mat;
+  ofstream unordered_mat;
   unordered_mat.open("unordered_mat.txt");
+  if(unordered_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      unordered_mat << mass_mat_unordered.coeffRef(i,j) << "/n";
+      unordered_mat << mass_mat_unordered.coeffRef(i,j) << "\n";
     }
   }
   unordered_mat.close();
@@ -202,11 +205,11 @@ void test_massMatrix(){
 
   mesh_test.mass_matrix(func, mass_mat_ordered);
 
-  fstream ordered_mat;
-  ordered_mat.open("unordered_mat.txt");
+  ofstream ordered_mat;
+  ordered_mat.open("ordered_mat.txt");
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      ordered_mat << mass_mat_ordered.coeffRef(i,j) << "/n";
+      ordered_mat << mass_mat_ordered.coeffRef(i,j) << "\n";
     }
   }
   ordered_mat.close();
