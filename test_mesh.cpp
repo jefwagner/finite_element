@@ -181,7 +181,7 @@ void test_massMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> mass_mat_unordered;
+  SparseMatrix<double, RowMajor, int> mass_mat_unordered(30, 30);
 
   mesh_test.mass_matrix(func, mass_mat_unordered);
 
@@ -189,7 +189,7 @@ void test_massMatrix(){
   *The unordered SparseMatrix plot code
   */
 
-  SparseMatrix<double, RowMajor, int> mass_mat_oredered;
+  SparseMatrix<double, RowMajor, int> mass_mat_oredered( 30, 30);
 
   mesh_test.reorder_nodes(12);
 
