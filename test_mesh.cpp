@@ -194,7 +194,9 @@ void test_massMatrix(){
   }
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      unordered_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
+      if(mass_mat_unordered.coeffRef(i,j) != 0){
+        unordered_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
+      }
     }
   }
   unordered_mat.close();
@@ -209,7 +211,9 @@ void test_massMatrix(){
   ordered_mat.open("ordered_mat.txt");
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      ordered_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
+      if(mass_mat_ordered.coeffRef(i,j) != 0){
+        ordered_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
+      }
     }
   }
   ordered_mat.close();
