@@ -227,6 +227,7 @@ compile_file(flags, 'test__main.cpp', 'test__main.o')
 test_objs = [re.sub('.cpp','.o',src) for src in test_files]
 extra_objs = [re.sub('.cpp','.o',src) for src in extra_srcs]
 all_objs = test_objs+extra_objs
+all_objs = list(set(all_objs))
 all_objs.append('test__main.o')
 link_files(flags, all_objs, 'test.test')
 # Run the test
