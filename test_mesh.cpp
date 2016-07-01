@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include "test.hpp"
 #include "mesh.hpp"
 #include "testbuilder.hpp"
@@ -8,6 +9,7 @@
 
 //function for t e s ting integrate
 
+using namespace std;
 namespace{
   double func(Vector2d point){
     double ret;
@@ -185,17 +187,29 @@ void test_massMatrix(){
 
   mesh_test.mass_matrix(func, mass_mat_unordered);
 
-  /*
-  *The unordered SparseMatrix plot code
-  */
+  fstream unordered_mat;
+  unordered_mat.open("unordered_mat.txt");
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      unordered_mat << mass_mat_unordered.coeffRef(i,j) << "/n";
+    }
+  }
+  unordered_mat.close();
 
-  SparseMatrix<double, RowMajor, int> mass_mat_oredered( 30, 30);
+  SparseMatrix<double, RowMajor, int> mass_mat_ordered( 30, 30);
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.mass_matrix(func, mass_mat_oredered);
+  mesh_test.mass_matrix(func, mass_mat_ordered);
 
-  /*
-  *The ordered SparseMatrix plot code
-  */
+  fstream ordered_mat;
+  ordered_mat.open("unordered_mat.txt");
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      ordered_mat << mass_mat_ordered.coeffRef(i,j) << "/n";
+    }
+  }
+  ordered_mat.close();
+
+  print_status(1 == 1, "massMatrix");
 }
