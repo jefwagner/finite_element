@@ -1,6 +1,7 @@
 #include "triangle.hpp"
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include "test.hpp"
 #include "mesh.hpp"
 #include "testbuilder.hpp"
@@ -8,6 +9,7 @@
 
 //function for t e s ting integrate
 
+using namespace std;
 namespace{
   double func(Vector2d point){
     double ret;
@@ -172,4 +174,45 @@ void test_integrate(){
   integral = round(integral);
 
   print_status(integral == 100, "Integrate");
+}
+
+void test_massMatrix(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double, RowMajor, int> mass_mat_unordered(mesh_test.num_points, mesh_test.num_points);
+
+  mesh_test.mass_matrix(func, mass_mat_unordered);
+
+  ofstream unordered_mat;
+  unordered_mat.open("unordered_mat.txt");
+  if(unordered_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      unordered_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
+    }
+  }
+  unordered_mat.close();
+
+  SparseMatrix<double, RowMajor, int> mass_mat_ordered(mesh_test.num_points, mesh_test.num_points);
+
+  mesh_test.reorder_nodes(12);
+
+  mesh_test.mass_matrix(func, mass_mat_ordered);
+
+  ofstream ordered_mat;
+  ordered_mat.open("ordered_mat.txt");
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      ordered_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
+    }
+  }
+  ordered_mat.close();
+
+  print_status(1 == 1, "massMatrix");
 }
