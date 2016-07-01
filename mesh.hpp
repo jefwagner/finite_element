@@ -83,7 +83,7 @@ public:
 
 	//methods created for reorder_nodes
 	int find_tri(int, int);
-	tri find_edge(int, int);
+	int find_edge(int, int);
 	void update_arr_builder(int, int *);
 	void add_without_duplicating(int *, int);
 	int find_negative(int *);

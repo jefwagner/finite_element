@@ -1,15 +1,19 @@
 #include "triangle.hpp"
 #include <stdio.h>
+#include <iostream>
 #include "test.hpp"
 #include "mesh.hpp"
+#include "testbuilder.hpp"
 
 
 //function for t e s ting integrate
 
-double func(Vector2d point){
-  double ret;
-  ret = 4. - ((point(0) - 2.) * (point(0) - 2.)) - ((point(1) - 2.) * (point(1) - 2.));
-  return ret;
+namespace{
+  double func(Vector2d point){
+    double ret;
+    ret = point[0] * point[1];
+    return ret;
+  }
 }
 
 void test_constructor(){
@@ -32,7 +36,6 @@ void test_constructor(){
   my_tio.trianglelist = new int[my_tio.numberoftriangles * 3];
   int start;
   int i;
-  int index = 0;
 
   for(start=0; start<25; start += 5){
       for(i=0; i<4; i++){
@@ -93,49 +96,46 @@ void test_constructor(){
 
   print_status(1==1   ,"Mesh Constructor");//t e s t mesh constructor
 
-  //Integration t e s t using a hemisphere
+}
 
-  double (*f)(Vector2d) = func;
+void test_reorder(){
+  triangulateio my_tio;
 
-  double integral = mesh_test.integrate(f); // t e s t integration actual value ~16.75
+  my_tio = mesh_constructor();
 
-  cout << "Integrate = " << integral << endl;
 
-  integral = round(integral);
-
-  print_status(integral == 17, "Integrate");
+  Mesh mesh_test(&my_tio);
 
   //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
 
   mesh_test.reorder_nodes(12);
 
-  //t e s t succeeds when the last 5 poinst have y value of 5
-
   int count = 0;
 
-  // Vector2d point = mesh_test.points_get(29);
-  //
-  // if(point[1] == 5){
-  //   count++;
-  // }
-  //
-  // print_status(count == 1, "reorder_nodes");
-  //
-  // //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
-  //
-  // mesh_test.reorder_nodes(17);
-  //
-  // //t e s t succeeds when the last 5 poinst have y value of 5
-  //
-  // count = 0;
-  //
-  // point = mesh_test.points_get(25);
-  //
-  // if(point[1] == 5){
-  //   count++;
-  // }
-  //
-  // print_status(count == 1, "reorder_nodes");
+  Vector2d point = mesh_test.points_get(29);
+
+  if(point[1] == 5.){
+    count++;
+  }
+
+  if(point[0] == 0.){
+    count++;
+  }
+
+  //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
+
+  mesh_test.reorder_nodes(5);  //Node 17 before the reorder above
+
+  //t e s t succeeds when the last 5 poinst have y value of 5
+
+  point = mesh_test.points_get(29);
+
+  if(point[1] == 0.){
+    count++;
+  }
+  if(point[0] == 4.){
+    count++;
+  }
 
   //Clean up
 
@@ -150,4 +150,26 @@ void test_constructor(){
   if(my_tio.edgelist != NULL){
     delete[] my_tio.edgelist;
   }
+
+  print_status( count==4, "reorder_nodes");
+}
+
+void test_integrate(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor();
+
+  Mesh mesh_test(&my_tio);
+
+  // print_status(1==1   ,"Mesh Constructor");//t e s t mesh constructor
+
+  //Integration t e s t using a hemisphere
+
+  double integral = mesh_test.integrate(func); // t e s t integration actual value ~16.75
+
+  cout << "Integrate = " << integral << endl;
+
+  integral = round(integral);
+
+  print_status(integral == 100, "Integrate");
 }
