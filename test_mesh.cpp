@@ -183,7 +183,7 @@ void test_massMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> mass_mat_unordered(30, 30);
+  SparseMatrix<double, RowMajor, int> mass_mat_unordered(mesh_test.num_points, mesh_test.num_points);
 
   mesh_test.mass_matrix(func, mass_mat_unordered);
 
@@ -194,12 +194,12 @@ void test_massMatrix(){
   }
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      unordered_mat << mass_mat_unordered.coeffRef(i,j) << "\n";
+      unordered_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
     }
   }
   unordered_mat.close();
 
-  SparseMatrix<double, RowMajor, int> mass_mat_ordered( 30, 30);
+  SparseMatrix<double, RowMajor, int> mass_mat_ordered(mesh_test.num_points, mesh_test.num_points);
 
   mesh_test.reorder_nodes(12);
 
@@ -209,7 +209,7 @@ void test_massMatrix(){
   ordered_mat.open("ordered_mat.txt");
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      ordered_mat << mass_mat_ordered.coeffRef(i,j) << "\n";
+      ordered_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
     }
   }
   ordered_mat.close();

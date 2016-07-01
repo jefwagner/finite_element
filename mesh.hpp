@@ -64,6 +64,7 @@ struct edge{
  * - stiffness_matrix: Populate a stiffness matrix from the mesh
  */
 class Mesh{
+public:
 	int num_points;
 	Vector2d *points;
 	int num_tris;
@@ -71,7 +72,6 @@ class Mesh{
 	int num_edges;
 	edge *edges;
 
-public:
 	Mesh(triangulateio *in);
 	~Mesh();
 
