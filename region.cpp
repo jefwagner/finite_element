@@ -2,8 +2,8 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "triangle.hpp"
 #include "mesh.hpp"
+#include "triangle.hpp"
 
 #define PI 3.14159265358979323846E+0
 
@@ -172,4 +172,3 @@ void print_mesh( fstream &f, Mesh &m){
 	}
 	f << endl;
 }
-

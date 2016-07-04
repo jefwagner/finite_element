@@ -1,8 +1,11 @@
 #include "region.hpp"
 #include "test.hpp"
+#include "triangle.hpp"
 
 void test_region(){
-	tio *in, *out, *vor;
+	tio *in;
+	tio *out;
+	tio *vor;
 
 	double r1 = 1;
 	double r2 = 1.2;
@@ -14,7 +17,8 @@ void test_region(){
 	fill_pslg(in, d, r1, r2);
 	out = malloc_tio();
 	vor = (tio *) NULL;
-	triangulate(static_cast<const char*>("pq30a0.1z"), in, out, vor);
+	char *triswitches = "pq30a0.1z";
+	triangulate(triswitches, in, out, vor);
 	Mesh m(out);
 
 	fstream f("region_mesh.txt", fstream::out);

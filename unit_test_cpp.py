@@ -114,8 +114,8 @@ def compile_file(flags, file, target):
 def link_files(flags, objects, target):
     print()
     print('Linking {}'.format(target))
-    cmd_string = '{} {} {} {} -o {}'.format(
-        flags['CXX'],flags['LDFLAGS'],flags['LIBS'],' '.join(objects),target)
+    cmd_string = '{} {} -o {} {} {}'.format(
+        flags['CXX'], flags['LDFLAGS'], target, ' '.join(objects), flags['LIBS'])
     print(cmd_string.strip())
     proc = Popen(shlex.split(cmd_string), stdout=PIPE, stderr=PIPE)
     (stdoutdata,stderrdata) = proc.communicate()

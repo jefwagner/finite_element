@@ -39,8 +39,9 @@ LDFLAGS = -L/usr/lib
 LDFLAGS += -L/usr/local/lib
 
 # Set the libraries to link to
-LIBS = -lm
-LIBS += -ltriangle
+LIBS = -ltriangle
+LIBS += -lm
+
 
 # Declare the test and clean as phoney
 # This lets Make know that there should
