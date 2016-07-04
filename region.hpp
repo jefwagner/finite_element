@@ -2,8 +2,8 @@
 #define JW_FE_REGION
 
 #include <fstream>
-#include "triangle.hpp"
 #include "mesh.hpp"
+#include "triangle.hpp"
 
 typedef struct triangulateio tio;
 

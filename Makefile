@@ -29,14 +29,30 @@ CXXFLAGS = -Wall
 CXXFLAGS += -O0 -ggdb
 
 # Set the inclusion and library path
-#INCFLAGS = -I/opt/local/include
-#INCFLAGS += -I/opt/local/include/eigen3
+
+# To make this compatible between os,
+
+#ifeq(<shell uname>, <Darwin = osx, LINUX = LINUX, Windows_NT>)
+	#commands
+#endif
+
+OS := $(Shell uname)
+
+ifeq (OS, Darwin)
+INCFLAGS = -I/opt/local/include
+INCFLAGS += -I/opt/local/include/eigen3
+
+LDFLAGS = -L/opt/local/lib
+
+else
 INCFLAGS = -I/usr/include
 INCFLAGS += -I/usr/include/eigen3
 INCFLAGS += -I/usr/local/include
-#LDFLAGS = -L/opt/local/lib
+
 LDFLAGS = -L/usr/lib
 LDFLAGS += -L/usr/local/lib
+
+endif
 
 # Set the libraries to link to
 LIBS = -ltriangle
