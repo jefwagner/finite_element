@@ -11,7 +11,7 @@ Mesh::Mesh(triangulateio *in){
 
 	num_points = in->numberofpoints;
 	num_tris = in->numberoftriangles;
-	num_edges = in->numberofedges;
+	num_edges = in->numberofsegments;
 
 	//creating arrays
 
@@ -41,8 +41,8 @@ Mesh::Mesh(triangulateio *in){
 	//Now the edge index, assuming 3 ints labeled, i,j
 
 	for(int i=0; i<num_edges; i++){
-		edges[i].i = in->edgelist[2*i+0];
-		edges[i].j = in->edgelist[2*i+1];
+		edges[i].i = in->segmentlist[2*i+0];
+		edges[i].j = in->segmentlist[2*i+1];
 	}
 }
 
@@ -102,7 +102,7 @@ void Mesh::to_triangulateio(triangulateio *out){
 
 	out->numberofpoints = num_points;
 	out->numberoftriangles = num_tris;
-	out->numberofedges = num_edges;
+	out->numberofsegments = num_edges;
 
 	out->pointlist = new double[num_points*2];
 	out->trianglelist = new int[num_tris*2];
@@ -231,6 +231,7 @@ void Mesh::update_arrays(int *update_arr){
 	//The swapping and filling the array with -1 as it does so
 	while(replacement != final_i){
 
+		points[element] = points[replacement];
 		swap_tri(element, replacement);
 		swap_edge(element, replacement);
 
