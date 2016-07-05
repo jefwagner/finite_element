@@ -72,6 +72,12 @@ public:
 	int num_edges;
 	edge *edges;
 
+	// Added for mass_mat, integrate, and stiff_mat
+	static Vector2d xieta[4];
+	static double weight[4];
+	static double v[3][4];
+	static double grad_v[3][2];
+
 	Mesh(triangulateio *in);
 	~Mesh();
 
@@ -93,6 +99,10 @@ public:
 	void swap_edge(int, int);
 	void tri_final_form();
 	void edge_final_form();
+
+	//methods created for stiffness_matrix
+	Vector2d gradient_v(int, Vector2d, Vector2d, Vector2d);
+	double dot(Vector2d, Vector2d);
 
 	//test functions
 	void test_fill();

@@ -46,6 +46,27 @@ Mesh::Mesh(triangulateio *in){
 	}
 }
 
+	//Added for integrate, mass_matrix stiffness_matrix
+	//Filling the xieta array and weight array that will be used in this guassian
+	//	integration where the first point in xieta is xi and the second is eta
+
+	Vector2d Mesh::xieta[4] = {
+		Vector2d(1./3., 1./3.),
+		Vector2d(1./5., 1./5.),
+		Vector2d(1./5., 3./5.),
+		Vector2d(3./5., 1./5.)
+	};
+
+	double Mesh::weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
+
+	double Mesh::v[3][4] = {{1./3., 3./5., 1./5., 1./5.},
+													{1./3., 1./5., 1./5., 3./5.},
+													{1./3., 1./5., 3./5., 1./5.}};
+	double Mesh::grad_v[3][2] = {{-1, -1},
+																{1, 0},
+																{0, 1}};
+
+
 //Deconstructor => frees all arrays created in Constructor
 
 Mesh::~Mesh(){
@@ -252,7 +273,6 @@ void Mesh::update_arrays(int *update_arr){
 void Mesh::swap_tri(int replace, int element){
 	int i;
 	int t;
-	int p;
 
 	for(t=0; t<num_tris; t++){
 		for( i=0; i<3; i++){
@@ -332,16 +352,6 @@ void Mesh::reorder_nodes(int n){
 
 	tri_final_form();
 
-	for(int t=0; t<num_tris; t++){
-		int i = tris[t].i;
-		int j = tris[t].j;
-		int k = tris[t].k;
-
-		Vector2d p0 = points[i];
-		Vector2d p1 = points[j];
-		Vector2d p2 = points[k];
-
-	}
 	edge_final_form();
 }
 
@@ -362,17 +372,6 @@ double Mesh::integrate(double(*func)(Vector2d)){
 
 	double k_element;
 	double all_elements;
-
-	//Filling the xieta array and weight array that will be used in this guassian
-	//	integration where the first point in xieta is xi and the second is eta
-	Vector2d xieta[] = {
-		Vector2d(1./3., 1./3.),
-		Vector2d(1./5., 1./5.),
-		Vector2d(1./5., 3./5.),
-		Vector2d(3./5., 1./5.)
-	};
-
-	double weight[] = {-27./48., 25./48., 25./48.,	25./48.};
 
 	//The actual sum, solving for the sum of each element and then summing over
 	//	all elements
@@ -403,21 +402,6 @@ double Mesh::integrate(double(*func)(Vector2d)){
 
 void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &mass_mat){
 
-	//Filling the xieta array and weight array that will be used in this guassian
-	//	integration where the first point in xieta is xi and the second is eta
-	Vector2d xieta[4] = {
-		Vector2d(1./3., 1./3.),
-		Vector2d(1./5., 1./5.),
-		Vector2d(1./5., 3./5.),
-		Vector2d(3./5., 1./5.)
-	};
-
-	double weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
-
-	double v[3][4] = {{1./3., 3./5., 1./5., 1./5.},
-										{1./3., 1./5., 1./5., 3./5.},
-										{1./3., 1./5., 3./5., 1./5.}};
-
 	int ii;
 	int jj;
 	int kk;
@@ -439,6 +423,64 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 					node_element += weight[k] * rho(ref_tri(xieta[k])) * v[i][k] * v[j][k];
 				}
 				mass_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
+			}
+		}
+	}
+}
+
+Vector2d Mesh::gradient_v(int i,  Vector2d p0, Vector2d p1, Vector2d p2){
+	double grad_a;
+	double grad_b;
+	double grad_c;
+	double grad_d;
+	double grad_const;
+
+	grad_a = p1[0] - p0[0];
+	grad_b = p2[0] - p0[0];
+	grad_c = p1[1] - p0[1];
+	grad_d = p2[1] - p0[1];
+	grad_const = 1./((grad_a * grad_d) - (grad_b * grad_c));
+
+	double xix = grad_d/grad_const;
+	double etax = -grad_c/grad_const;
+	double xiy = -grad_b/grad_const;
+	double etay = grad_a/grad_const;
+
+	Vector2d ret;
+
+	ret[0] = (grad_v[i][0] * xix) + (grad_v[i][1] * etax);
+	ret[1] = (grad_v[i][0] * xiy) + (grad_v[i][1] * etay);
+
+	return ret;
+}
+
+double Mesh::dot(Vector2d a, Vector2d b){
+	return (a[0]*b[0]) + (a[1]*b[1]);
+}
+
+void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMajor, int> &stiff_mat){
+	int ii;
+	int jj;
+	int kk;
+	double node_element;
+
+	for(int t=0; t<num_tris; t++){
+		ii = tris[t].i;
+		jj = tris[t].j;
+		kk = tris[t].k;
+
+		Vector2d p0 = points[ii];
+		Vector2d p1 = points[jj];
+		Vector2d p2 = points[kk];
+
+		FromRefTri ref_tri(p0, p1, p2);
+		for(int i=0; i<3; i++){
+			for(int j=0; j<3; j++){
+				node_element = 0;
+				for(int k=0; k<4; k++){
+					node_element += weight[k] * stiff(ref_tri(xieta[k])) * dot(gradient_v(i, p0, p1,p2), gradient_v(j, p0, p1, p2));
+				}
+				stiff_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
 			}
 		}
 	}

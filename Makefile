@@ -32,7 +32,7 @@ CXXFLAGS += -O0 -ggdb
 
 # To make this compatible between os,
 
-#ifeq(<shell uname>, <Darwin = osx, LINUX = LINUX, Windows_NT>)
+#ifeq(<shell uname>, <Darwin = osx, Linux = Linux>)
 	#commands
 #endif
 
