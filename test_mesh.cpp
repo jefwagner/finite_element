@@ -187,19 +187,19 @@ void test_massMatrix(){
 
   mesh_test.mass_matrix(func, mass_mat_unordered);
 
-  ofstream unordered_mat;
-  unordered_mat.open("unordered_mat.txt");
-  if(unordered_mat.is_open() == false){
+  ofstream unordered_mass_mat;
+  unordered_mass_mat.open("unordered_mass_mat.txt");
+  if(unordered_mass_mat.is_open() == false){
     cout << "Unable to open file" << endl << std::flush;
   }
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_unordered.coeffRef(i,j) != 0){
-        unordered_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
+        unordered_mass_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  unordered_mat.close();
+  unordered_mass_mat.close();
 
   SparseMatrix<double, RowMajor, int> mass_mat_ordered(mesh_test.num_points, mesh_test.num_points);
 
@@ -207,16 +207,61 @@ void test_massMatrix(){
 
   mesh_test.mass_matrix(func, mass_mat_ordered);
 
-  ofstream ordered_mat;
-  ordered_mat.open("ordered_mat.txt");
+  ofstream ordered_mass_mat;
+  ordered_mass_mat.open("ordered_mass_mat.txt");
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_ordered.coeffRef(i,j) != 0){
-        ordered_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
+        ordered_mass_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  ordered_mat.close();
+  ordered_mass_mat.close();
 
   print_status(1 == 1, "massMatrix");
+}
+
+void test_stiffnessMatrix(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double, RowMajor, int> stiff_mat_unordered(mesh_test.num_points, mesh_test.num_points);
+
+  mesh_test.stiffness_matrix(func, stiff_mat_unordered);
+
+  ofstream unordered_stiff_mat;
+  unordered_stiff_mat.open("unordered_stiff_mat.txt");
+  if(unordered_stiff_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(stiff_mat_unordered.coeffRef(i,j) != 0){
+        unordered_stiff_mat << i << "," << j << "," << stiff_mat_unordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  unordered_stiff_mat.close();
+
+  SparseMatrix<double, RowMajor, int> stiff_mat_ordered(mesh_test.num_points, mesh_test.num_points);
+
+  mesh_test.reorder_nodes(12);
+
+  mesh_test.stiffness_matrix(func, stiff_mat_ordered);
+
+  ofstream ordered_stiff_mat;
+  ordered_stiff_mat.open("ordered_stiff_mat.txt");
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(stiff_mat_ordered.coeffRef(i,j) != 0){
+        ordered_stiff_mat << i << "." << j << "," << stiff_mat_ordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  ordered_stiff_mat.close();
+
+  print_status(1 ==1, "stiffnessMatrix");
 }
