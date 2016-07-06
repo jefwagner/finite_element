@@ -30,11 +30,7 @@ CXXFLAGS += -O0 -ggdb
 
 # Set the inclusion and library path
 
-# To make this compatible between os,
-
-#ifeq(<shell uname>, <Darwin = osx, Linux = Linux>)
-	#commands
-#endif
+# To make this compatible between OSX and Linux,
 
 OS := $(Shell uname)
 

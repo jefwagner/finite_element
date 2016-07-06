@@ -3,6 +3,26 @@
 #include <iostream>
 #include <cmath>
 
+//Added for integrate, mass_matrix stiffness_matrix
+//Filling the xieta array and weight array that will be used in this guassian
+//	integration where the first point in xieta is xi and the second is eta
+
+Vector2d Mesh::xieta[4] = {
+	Vector2d(1./3., 1./3.),
+	Vector2d(1./5., 1./5.),
+	Vector2d(1./5., 3./5.),
+	Vector2d(3./5., 1./5.)
+};
+
+double Mesh::weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
+
+double Mesh::v[3][4] = {{1./3., 3./5., 1./5., 1./5.},
+												{1./3., 1./5., 1./5., 3./5.},
+												{1./3., 1./5., 3./5., 1./5.}};
+double Mesh::grad_v[3][2] = {{-1, -1},
+															{1, 0},
+															{0, 1}};
+
 //Constructor => fills data in Mesh, assuming triangle has already run
 
 Mesh::Mesh(triangulateio *in){
@@ -45,27 +65,6 @@ Mesh::Mesh(triangulateio *in){
 		edges[i].j = in->segmentlist[2*i+1];
 	}
 }
-
-	//Added for integrate, mass_matrix stiffness_matrix
-	//Filling the xieta array and weight array that will be used in this guassian
-	//	integration where the first point in xieta is xi and the second is eta
-
-	Vector2d Mesh::xieta[4] = {
-		Vector2d(1./3., 1./3.),
-		Vector2d(1./5., 1./5.),
-		Vector2d(1./5., 3./5.),
-		Vector2d(3./5., 1./5.)
-	};
-
-	double Mesh::weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
-
-	double Mesh::v[3][4] = {{1./3., 3./5., 1./5., 1./5.},
-													{1./3., 1./5., 1./5., 3./5.},
-													{1./3., 1./5., 3./5., 1./5.}};
-	double Mesh::grad_v[3][2] = {{-1, -1},
-																{1, 0},
-																{0, 1}};
-
 
 //Deconstructor => frees all arrays created in Constructor
 
