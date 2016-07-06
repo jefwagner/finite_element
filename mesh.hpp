@@ -86,7 +86,7 @@ public:
 	// Use either depending on whether v or the
 	//	gradient of v is used in the member function
 	static double v[3][4];
-	static double grad_v[3][2];
+	static Vector2d grad_v[3];
 	//----------------------------------------------
 
 	// Start of member functions
@@ -155,15 +155,9 @@ public:
 
 	//----------------------------------------------
 	// Methods created for stiffness_matrix:
-	//	-gradient_v: Finds the gradient of v, or
-	//		more accurately, the gradient of v in
-	//		Xi-Eta space dotted with the Jacobian or
-	//		the transpose of the Jacobian dotted with
-	//		the gradient.
-	//	-dot: Finds the dot product of a 1 by 2 and
-	//		a 2 by 1 vector.
-	Vector2d gradient_v(int, Vector2d, Vector2d, Vector2d);
-	double dot(Vector2d, Vector2d);
+	//	-jacobian: Creates a 2 by 2 matrix that is
+	//		is equal to the Jacobian.
+	Matrix2d jacobian(Vector2d, Vector2d, Vector2d);
 
 	//----------------------------------------------
 	// Test functions:
