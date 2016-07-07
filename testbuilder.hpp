@@ -7,6 +7,8 @@ using namespace Eigen;
 
 namespace{
 
+  // The goal of this is to fake a triangulateio output.
+  //  -The mesh that is being created is in described on pg 54 in the notebook.
   triangulateio mesh_constructor(){
     triangulateio my_tio;
     my_tio.pointlist = NULL;

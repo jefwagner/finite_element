@@ -19,6 +19,10 @@ namespace{
 }
 
 void test_constructor(){
+
+  // The Goal is to fake a triangulateio output
+  //  -The mesh that this describes is on pg 54 in the notebook.
+  //  -A copy of this is in testbuilder.hpp.
   triangulateio my_tio;
   my_tio.pointlist = NULL;
   my_tio.trianglelist = NULL;
@@ -101,6 +105,8 @@ void test_constructor(){
 }
 
 void test_reorder(){
+
+  // Call the constructor to construct the t e s t mesh.
   triangulateio my_tio;
 
   my_tio = mesh_constructor();
@@ -116,6 +122,7 @@ void test_reorder(){
 
   Vector2d point = mesh_test.points_get(29);
 
+  // T e s t if the last point listed is the farthest away.
   if(point[1] == 5.){
     count++;
   }
@@ -124,14 +131,13 @@ void test_reorder(){
     count++;
   }
 
-  //reorder_nodes t e s t by organizing around the 12th point at 2,2 in a 5 by 6 grid
+  //reorder_nodes t e s t by organizing around the 5th point at 2,3 in a 5 by 6 grid
 
   mesh_test.reorder_nodes(5);  //Node 17 before the reorder above
 
-  //t e s t succeeds when the last 5 poinst have y value of 5
-
   point = mesh_test.points_get(29);
 
+  // T e s t if the last point listed is the farthes away.
   if(point[1] == 0.){
     count++;
   }
@@ -153,6 +159,7 @@ void test_reorder(){
     delete[] my_tio.segmentlist;
   }
 
+  // Print success only if both reorders pass above.
   print_status( count==4, "reorder_nodes");
 }
 
