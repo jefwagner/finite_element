@@ -16,6 +16,13 @@ namespace{
     ret = point[0] * point[1];
     return ret;
   }
+
+  double rand_func(Vector2d point){
+    double ret;
+    ret = rand() % 100;
+    // ret = 10 - (point[0] * point[0]) - (point[1] * point[1]);
+    return ret;
+  }
 }
 
 void test_constructor(){
@@ -192,7 +199,7 @@ void test_massMatrix(){
 
   SparseMatrix<double, RowMajor, int> mass_mat_unordered(mesh_test.num_points, mesh_test.num_points);
 
-  mesh_test.mass_matrix(func, mass_mat_unordered);
+  mesh_test.mass_matrix(rand_func, mass_mat_unordered);
 
   ofstream unordered_mass_mat;
   unordered_mass_mat.open("unordered_mass_mat.txt");
@@ -213,7 +220,7 @@ void test_massMatrix(){
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.mass_matrix(func, mass_mat_ordered);
+  mesh_test.mass_matrix(rand_func, mass_mat_ordered);
 
   ofstream ordered_mass_mat;
   ordered_mass_mat.open("ordered_mass_mat.txt");
@@ -242,7 +249,7 @@ void test_stiffnessMatrix(){
 
   SparseMatrix<double, RowMajor, int> stiff_mat_unordered(mesh_test.num_points, mesh_test.num_points);
 
-  mesh_test.stiffness_matrix(func, stiff_mat_unordered);
+  mesh_test.stiffness_matrix(rand_func, stiff_mat_unordered);
 
   ofstream unordered_stiff_mat;
   unordered_stiff_mat.open("unordered_stiff_mat.txt");
@@ -263,7 +270,7 @@ void test_stiffnessMatrix(){
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.stiffness_matrix(func, stiff_mat_ordered);
+  mesh_test.stiffness_matrix(rand_func, stiff_mat_ordered);
 
   ofstream ordered_stiff_mat;
   ordered_stiff_mat.open("ordered_stiff_mat.txt");

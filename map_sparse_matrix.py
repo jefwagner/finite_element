@@ -23,8 +23,6 @@ def file_plot_data(filename):
 
 data = file_plot_data("unordered_mass_mat.txt")
 
-print(data)
-
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0],data[0]))
 
 plt.spy(mat)
@@ -33,8 +31,6 @@ plt.show()
 plt.close()
 
 data = file_plot_data("ordered_mass_mat.txt")
-
-print(data)
 
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0],data[0]))
 
@@ -45,8 +41,6 @@ plt.close()
 
 data = file_plot_data("unordered_stiff_mat.txt")
 
-print(data)
-
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0], data[0]))
 
 plt.spy(mat)
@@ -56,8 +50,6 @@ plt.close()
 
 data = file_plot_data("ordered_stiff_mat.txt")
 
-print(data)
-
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0], data[0]))
 
 plt.spy(mat)
@@ -65,4 +57,4 @@ plt.title("Ordered Stiffness Matrix")
 plt.show()
 plt.close()
 
-print("Figure Printed!!")
+print("Figures Printed!!")
