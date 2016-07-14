@@ -199,6 +199,7 @@ void test_massMatrix(){
   if(unordered_mass_mat.is_open() == false){
     cout << "Unable to open file" << endl << std::flush;
   }
+  unordered_mass_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_unordered.coeffRef(i,j) != 0){
@@ -216,6 +217,10 @@ void test_massMatrix(){
 
   ofstream ordered_mass_mat;
   ordered_mass_mat.open("ordered_mass_mat.txt");
+  if(ordered_mass_mat.is_open() == false){
+    cout << "Unable to open ordered_mass_mat" << endl << std::flush;
+  }
+    ordered_mass_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_ordered.coeffRef(i,j) != 0){
@@ -244,6 +249,7 @@ void test_stiffnessMatrix(){
   if(unordered_stiff_mat.is_open() == false){
     cout << "Unable to open file" << endl << std::flush;
   }
+    unordered_stiff_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(stiff_mat_unordered.coeffRef(i,j) != 0){
@@ -261,10 +267,14 @@ void test_stiffnessMatrix(){
 
   ofstream ordered_stiff_mat;
   ordered_stiff_mat.open("ordered_stiff_mat.txt");
+  if(ordered_stiff_mat.is_open() == false){
+    cout << "Unable to open ordered_stiff_mat" << endl << std::flush;
+  }
+    ordered_stiff_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(stiff_mat_ordered.coeffRef(i,j) != 0){
-        ordered_stiff_mat << i << "." << j << "," << stiff_mat_ordered.coeffRef(i,j) << "\n";
+        ordered_stiff_mat << i << "," << j << "," << stiff_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }
