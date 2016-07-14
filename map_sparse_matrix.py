@@ -1,38 +1,25 @@
 from scipy.sparse import coo_matrix
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-row = []
-col = []
-data = []
-
-# def coo_matrix_fill(filename):
-#     with open(filename) as f:
-#         i = 0
-#         for line in f:
-#             row[i] = f.read(1)
-#             f.read(1)
-#             col[i] = f.reat(1)
-#             f.read(1)
-#             data[i] = f.read()
-#             i += 1
-#
-def sparse_matrix_fill(filename):
+def fileplot(filename):
     with open(filename, 'r') as f:
-        i = 0
+        row = []
+        col = []
+        data = []
         for line in f:
-            row[i] = f.read(1)
-            f.read(1)
-            col[i] = f.read(1)
-            f.read(1)
-            data[i] = f.read()
+            count = 0
+            for word in line.split(','):
+                if (count == 0):
+                    row.append(int(word))
+                elif (count == 1):
+                    col.append(int(word))
+                else:
+                    data.append(float(word))
+                count += 1
 
+        return (row, col, data)
 
+data = fileplot("unordered_mass_mat.txt")
 
-
-            print i
-
-            i+=1
-
-sparse_matrix_fill("unordered_mass_mat.txt")
-# coo_matrix_fill("unordered_mass_mat.txt")
+print data
