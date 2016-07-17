@@ -10,7 +10,7 @@ def file_plot_data(filename):
         num_points = f.readline()
         for line in f:
             count = 0
-            for word in line.split(','):
+            for word in line.split():
                 if (count == 0):
                     row.append(int(word))
                 elif (count == 1):

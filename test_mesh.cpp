@@ -210,7 +210,7 @@ void test_massMatrix(){
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_unordered.coeffRef(i,j) != 0){
-        unordered_mass_mat << i << "," << j << "," << mass_mat_unordered.coeffRef(i,j) << "\n";
+        unordered_mass_mat << i << " " << j << " " << mass_mat_unordered.coeffRef(i,j) << "\n";
       }
     }
   }
@@ -231,7 +231,7 @@ void test_massMatrix(){
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(mass_mat_ordered.coeffRef(i,j) != 0){
-        ordered_mass_mat << i << "," << j << "," << mass_mat_ordered.coeffRef(i,j) << "\n";
+        ordered_mass_mat << i << " " << j << " " << mass_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }
@@ -260,7 +260,7 @@ void test_stiffnessMatrix(){
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(stiff_mat_unordered.coeffRef(i,j) != 0){
-        unordered_stiff_mat << i << "," << j << "," << stiff_mat_unordered.coeffRef(i,j) << "\n";
+        unordered_stiff_mat << i << " " << j << " " << stiff_mat_unordered.coeffRef(i,j) << "\n";
       }
     }
   }
@@ -281,7 +281,7 @@ void test_stiffnessMatrix(){
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
       if(stiff_mat_ordered.coeffRef(i,j) != 0){
-        ordered_stiff_mat << i << "," << j << "," << stiff_mat_ordered.coeffRef(i,j) << "\n";
+        ordered_stiff_mat << i << " " << j << " " << stiff_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }

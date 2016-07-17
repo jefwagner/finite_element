@@ -19,6 +19,15 @@ namespace{
 		(*n)++;
 	}
 
+	void add_point_elipse(double *pl, int *n, double a, double b, int size){
+		double theta = 2*PI * ((*n)/size);
+		double x = a*cos(theta);
+		double y = b*sin(theta);
+		pl[2*(*n)+0] = x;
+		pl[2*(*n)+1] = y;
+		(*n)++;
+	}
+
 	void free_if_not_null( void *ptr){
 		if( ptr != NULL){
 			free(ptr);
@@ -111,7 +120,17 @@ void fill_pslg(tio *in, double d, double r1, double r2){
 	sl = in->segmentlist;
 	sml = in->segmentmarkerlist;
 	// Four corners of surrounding box
+
+	// // Making the box into an elipse, the code for the box is still there
+	// // size indicates resolution of elipse, higher size, higher resolution
+	// int size = 4;
+
 	first = n;
+
+	// for(i=first; i<size; i++){
+	// 	add_point_elipse(pl, &n, d, 1.5 * d, size);
+	// }
+
 	add_point(pl, &n, 1.5*d, d);
 	add_point(pl, &n, 1.5*d, -d);
 	add_point(pl, &n, -1.5*d, -d);
