@@ -197,10 +197,8 @@ void test_massMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
-
-  cout << mesh_test.num_points-mesh_test.num_edges << " " << mesh_test.num_edges << endl;
+  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
   mesh_test.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
@@ -212,13 +210,12 @@ void test_massMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   unordered_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(bound_mat_unordered.coeffRef(i,j) != 0){
-        unordered_bound_mat << i << " " << j << " " << bound_mat_unordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_unordered,k); it; ++it){
+      unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "unordered_bound_mat.txt finished writing." << endl;
   unordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -229,23 +226,22 @@ void test_massMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   unordered_not_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(not_bound_mat_unordered.coeffRef(i,j) != 0){
-        unordered_not_bound_mat << i << " " << j << " " << not_bound_mat_unordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<not_bound_mat_unordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
+      unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "unordered_not_bound_mat.txt finished writing." << endl;
   unordered_not_bound_mat.close();
 
   // Ordered Nodes
 
-  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.mass_matrix(rand_func, bound_mat_ordered, not_bound_mat_ordered);
+  mesh_test.mass_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
 
   // Nodes on the boundary
 
@@ -255,13 +251,12 @@ void test_massMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   ordered_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(bound_mat_ordered.coeffRef(i,j) != 0){
-        ordered_bound_mat << i << " " << j << " " << bound_mat_ordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<bound_mat_ordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_ordered,k); it; ++it){
+      ordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "ordered_bound_mat.txt finished writing." << endl;
   ordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -272,13 +267,12 @@ void test_massMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   ordered_not_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(not_bound_mat_ordered.coeffRef(i,j) != 0){
-        ordered_not_bound_mat << i << " " << j << " " << not_bound_mat_ordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<not_bound_mat_ordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
+      ordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "ordered_not_bound_mat.txt finished writing." << endl;
   ordered_not_bound_mat.close();
 
   print_status(1 == 1, "massMatrix");
@@ -291,10 +285,10 @@ void test_stiffnessMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
-  mesh_test.stiffness_matrix(rand_func, bound_mat_unordered, not_bound_mat_unordered);
+  mesh_test.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
   // Nodes on the boundary
 
@@ -304,13 +298,12 @@ void test_stiffnessMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   unordered_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(bound_mat_unordered.coeffRef(i,j) != 0){
-        unordered_bound_mat << i << " " << j << " " << bound_mat_unordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_unordered,k); it; ++it){
+      unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "unordered_bound_mat.txt finished writing." << endl;
   unordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -321,21 +314,21 @@ void test_stiffnessMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   unordered_not_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(not_bound_mat_unordered.coeffRef(i,j) != 0){
-        unordered_not_bound_mat << i << " " << j << " " << not_bound_mat_unordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<not_bound_mat_unordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
+      unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "unordered_not_bound_mat.txt finished writing." << endl;
   unordered_not_bound_mat.close();
 
-  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+
+  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.stiffness_matrix(rand_func, bound_mat_ordered, not_bound_mat_ordered);
+  mesh_test.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
 
   // Nodes on the boundary
 
@@ -345,13 +338,12 @@ void test_stiffnessMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   ordered_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(bound_mat_ordered.coeffRef(i,j) != 0){
-        ordered_bound_mat << i << " " << j << " " << bound_mat_ordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<bound_mat_ordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_ordered,k); it; ++it){
+      ordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "ordered_bound_mat.txt finished writing." << endl;
   ordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -362,13 +354,12 @@ void test_stiffnessMatrix(){
     cout << "Unable to open file" << endl << std::flush;
   }
   ordered_not_bound_mat << mesh_test.num_points<< "\n";
-  for(int i=0; i<30; i++){
-    for(int j=0; j<30; j++){
-      if(not_bound_mat_ordered.coeffRef(i,j) != 0){
-        ordered_not_bound_mat << i << " " << j << " " << not_bound_mat_ordered.coeffRef(i,j) << "\n";
-      }
+  for(int k=0; k<not_bound_mat_ordered.outerSize(); ++k){
+    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
+      ordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
     }
   }
+  cout << "ordered_not_bound_mat.txt finished writing." << endl;
   ordered_not_bound_mat.close();
 
 

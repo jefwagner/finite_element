@@ -192,8 +192,8 @@ void print_mat(Mesh &m, int center){
 
 	// Unordered Mass Matrix
 
-	SparseMatrix<double, RowMajor, int> bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
+	SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+	SparseMatrix<double, RowMajor, int> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
 
 	m.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 	m.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
