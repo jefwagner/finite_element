@@ -21,39 +21,39 @@ def file_plot_data(filename):
 
         return (num_points, row, col, data)
 
-data = file_plot_data("unordered_mass_mat.txt")
+data = file_plot_data("unordered_bound_mat.txt")
 
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0],data[0]))
 
-plt.spy(mat)
-plt.title("Unordered Mass Matrix")
+plt.spy(mat, precision=0.0001)
+plt.title("Unordered Bound Matrix")
 plt.show()
 plt.close()
 
-data = file_plot_data("ordered_mass_mat.txt")
+data = file_plot_data("ordered_bound_mat.txt")
 
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0],data[0]))
 
-plt.spy(mat)
-plt.title("Ordered Mass Matrix")
+plt.spy(mat, precision=0.0001)
+plt.title("Ordered Bound Matrix")
 plt.show()
 plt.close()
 
-data = file_plot_data("unordered_stiff_mat.txt")
+data = file_plot_data("unordered_not_bound_mat.txt")
 
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0], data[0]))
 
-plt.spy(mat)
-plt.title("Unordered Stiffness Matrix")
+plt.spy(mat, precision=0.0001)
+plt.title("Unordered Not Bound Matrix")
 plt.show()
 plt.close()
 
-data = file_plot_data("ordered_stiff_mat.txt")
+data = file_plot_data("ordered_not_bound_mat.txt")
 
 mat = coo_matrix((data[3], (data[1], data[2])), shape=(data[0], data[0]))
 
-plt.spy(mat)
-plt.title("Ordered Stiffness Matrix")
+plt.spy(mat, precision=0.0001)
+plt.title("Ordered Not Bound Matrix")
 plt.show()
 plt.close()
 

@@ -556,15 +556,119 @@ double Mesh::integrate(double(*func)(Vector2d)){
 }
 
 //###############################################
+// Functions for mass_matrix and stiffness_matrix
+
+//-----------------------------------------------
+// find_not_bound -> find the index of a node in
+//	not_bound if it is an element of not_bound,
+//	else return -1.
+
+int Mesh::find_not_bound(int n, int *not_bound){
+	int b;
+
+	// Go through each element in not bound, b,
+	//	and check if node, n, is an element. If it
+	//	is, return the index of the element in
+	//	not_bound. If it isn't, return -1.
+
+	for(b=0; b<num_points - num_edges; b++){
+		if(not_bound[b] == n){
+			return b;
+		}
+	}
+	return -1;
+}
+
+//-----------------------------------------------
+// find_bound -> find the index of a node in
+//	bound if it is an element of bound,
+//	else return -1.
+
+int Mesh::find_bound(int n, int *bound){
+	int b;
+
+	// Go through each element in bound, b,
+	//	and check if node, n, is an element. If it
+	//	is, return the index of the element in
+	//	bound. If it isn't, return -1.
+
+	for(b=0; b<num_edges; b++){
+		if(bound[b] == n){
+			return b;
+		}
+	}
+	return -1;
+}
+
+//###############################################
 // mass_matrix -> build a matrix that will use
 //	the density function to solve for a
 //	Sparse Matrix that will be used to find the
 //	work done.
-void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &mass_mat){
+void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &bound_mat, SparseMatrix<double, RowMajor, int> &not_bound_mat){
 	int ii;
 	int jj;
 	int kk;
 	double node_element;
+	bool on_edge, add_to;
+	bool inside;
+	int row, col;
+
+	// Building the points not on the boundary array
+
+	int * not_bound = new int[num_points-num_edges];
+	for(int i=0; i<num_points-num_edges; i++){
+		not_bound[i] = -1;
+	}
+
+	for(int p=0; p<num_points; p++){
+		on_edge = false;
+		for(int e=0; e<num_edges; e++){
+			if(find_edge(p,e) != -1){
+				on_edge = true;
+			}
+		}
+		if(!on_edge){
+			for(int i=0; i<num_points - num_edges; i++){
+				if((not_bound[i] == p) && (not_bound[i] != -1)){
+					inside = true;
+					break;
+				}
+			}
+			if(!inside){
+				int index = find_negative(not_bound);
+				not_bound[index] = p;
+			}
+		}
+	}
+
+	// Building the points on the boundary array
+
+	int * bound = new int[num_edges];
+	for(int i=0; i<num_edges; i++){
+		bound[i] = -1;
+	}
+
+	for(int p=0; p<num_points; p++){
+		on_edge = false;
+		for(int e=0; e<num_edges; e++){
+			if(find_edge(p,e) != -1){
+				on_edge = true;
+			}
+		}
+		if(on_edge){
+			for(int i=0; i<num_edges; i++){
+				if((bound[i] == p) && (bound[i] != -1)){
+					inside = true;
+					break;
+				}
+			}
+			if(!inside){
+				int index = find_negative(bound);
+				bound[index] = p;
+			}
+		}
+	}
 
 	// This has a very similar set up to the Guassian
 	//	Legrangian integration described above. This
@@ -586,13 +690,42 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
 				node_element = 0;
+				on_edge = false;
+				add_to = false;
 				for(int k=0; k<4; k++){
 					node_element += weight[k] * rho(ref_tri(xieta[k])) * v[i][k] * v[j][k];
 				}
-				mass_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
+
+				for(int e=0; e<num_edges; e++){
+					if((find_edge(tris[t][i], e) != -1) && (find_not_bound(tris[t][j], not_bound) != -1)){
+							on_edge = true;
+							cout << "Found Bound!!" << endl;
+							cout << tris[t][i] << " " << tris[t][j] << endl;
+							col = find_bound(tris[t][i], bound);
+							row = find_not_bound(tris[t][j], not_bound);
+							break;
+					} else if((find_not_bound(tris[t][i], not_bound) != -1) && (find_not_bound(tris[t][j], not_bound) != -1)){
+						add_to = true;
+						cout << "Found not Bound!!" << endl;
+						row = find_not_bound(tris[t][i], not_bound);
+						col = find_not_bound(tris[t][j], not_bound);
+						break;
+					}
+				}
+
+				if(on_edge){
+					cout << "Bound: " << row << ", " << col << endl;
+					bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+				} else if(add_to){
+					cout << tris[t][i] << " " << tris[t][j] << endl;
+					cout << "Not Bound: " << row << ", " << col << endl;
+					not_bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+				}
 			}
 		}
 	}
+	delete[] not_bound;
+	delete[] bound;
 }
 
 //###############################################
@@ -634,11 +767,12 @@ Matrix2d Mesh::jacobian(Vector2d p0, Vector2d p1, Vector2d p2){
 //	the stiffness function to solve for a
 //	Sparse Matrix that will be used to find the
 //	work done.
-void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMajor, int> &stiff_mat){
+void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMajor, int> &bound_mat, SparseMatrix<double, RowMajor, int> &not_bound_mat){
 	int ii;
 	int jj;
 	int kk;
 	double node_element;
+	bool on_edge;
 
 	// Built similar to integrate or mass_matrix.
 	for(int t=0; t<num_tris; t++){
@@ -665,7 +799,18 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMa
 					double gradient = ((grad_v[i].transpose() * jacob) * (jacob.transpose() * grad_v[j]));
 					node_element += weight[k] * stiff(ref_tri(xieta[k])) * gradient;
 				}
-				stiff_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
+				for(int e=0; e<num_edges; e++){
+					if(find_edge(tris[t][i], e) != -1){
+						on_edge = true;
+						break;
+					}
+				}
+				if(on_edge){
+					bound_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
+				} else{
+					not_bound_mat.coeffRef(tris[t][i], tris[t][j]) += node_element * ref_tri.jac();
+
+				}
 			}
 		}
 	}

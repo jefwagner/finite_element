@@ -14,5 +14,10 @@ void free_tio(tio *in);
 void fill_pslg(tio *in, double d, double r1, double r2);
 void print_mesh( fstream &f, Mesh &m);
 
+// Added for SparseMatrix
+
+void print_mat( Mesh &m, int);
+// void print_stiff_mat(Mesh &m, int);
+
 
 #endif /* JW_FE_REGION */

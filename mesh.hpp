@@ -104,8 +104,8 @@ public:
 	void to_triangulateio( triangulateio *out);
 	void reorder_nodes( int);
 	double integrate( double(*func)(Vector2d));
-	void mass_matrix( double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &);
-	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double, RowMajor, int> &);
+	void mass_matrix( double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &, SparseMatrix<double, RowMajor, int> &);
+	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double, RowMajor, int> &, SparseMatrix<double, RowMajor, int> &);
 
 	//----------------------------------------------
 	// Methods created for reorder_nodes
@@ -152,6 +152,12 @@ public:
 	void swap_edge(int, int);
 	void tri_final_form();
 	void edge_final_form();
+
+	//----------------------------------------------
+	// Methods created for stiffness_matrix and
+	// 	mass_matrix.
+	int find_not_bound(int , int *);
+	int find_bound(int, int *);
 
 	//----------------------------------------------
 	// Methods created for stiffness_matrix:

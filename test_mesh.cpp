@@ -197,45 +197,89 @@ void test_massMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> mass_mat_unordered(mesh_test.num_points, mesh_test.num_points);
+  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
-  mesh_test.mass_matrix(rand_func, mass_mat_unordered);
+  cout << mesh_test.num_points-mesh_test.num_edges << " " << mesh_test.num_edges << endl;
 
-  ofstream unordered_mass_mat;
-  unordered_mass_mat.open("unordered_mass_mat.txt");
-  if(unordered_mass_mat.is_open() == false){
+  mesh_test.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
+
+  // Nodes on the boundary
+
+  ofstream unordered_bound_mat;
+  unordered_bound_mat.open("unordered_bound_mat.txt");
+  if(unordered_bound_mat.is_open() == false){
     cout << "Unable to open file" << endl << std::flush;
   }
-  unordered_mass_mat << mesh_test.num_points<< "\n";
+  unordered_bound_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      if(mass_mat_unordered.coeffRef(i,j) != 0){
-        unordered_mass_mat << i << " " << j << " " << mass_mat_unordered.coeffRef(i,j) << "\n";
+      if(bound_mat_unordered.coeffRef(i,j) != 0){
+        unordered_bound_mat << i << " " << j << " " << bound_mat_unordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  unordered_mass_mat.close();
+  unordered_bound_mat.close();
 
-  SparseMatrix<double, RowMajor, int> mass_mat_ordered(mesh_test.num_points, mesh_test.num_points);
+  // Nodes not on the boundary
+
+  ofstream unordered_not_bound_mat;
+  unordered_not_bound_mat.open("unordered_not_bound_mat.txt");
+  if(unordered_not_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  unordered_not_bound_mat << mesh_test.num_points<< "\n";
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(not_bound_mat_unordered.coeffRef(i,j) != 0){
+        unordered_not_bound_mat << i << " " << j << " " << not_bound_mat_unordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  unordered_not_bound_mat.close();
+
+  // Ordered Nodes
+
+  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.mass_matrix(rand_func, mass_mat_ordered);
+  mesh_test.mass_matrix(rand_func, bound_mat_ordered, not_bound_mat_ordered);
 
-  ofstream ordered_mass_mat;
-  ordered_mass_mat.open("ordered_mass_mat.txt");
-  if(ordered_mass_mat.is_open() == false){
-    cout << "Unable to open ordered_mass_mat" << endl << std::flush;
+  // Nodes on the boundary
+
+  ofstream ordered_bound_mat;
+  ordered_bound_mat.open("ordered_bound_mat.txt");
+  if(ordered_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
   }
-    ordered_mass_mat << mesh_test.num_points<< "\n";
+  ordered_bound_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      if(mass_mat_ordered.coeffRef(i,j) != 0){
-        ordered_mass_mat << i << " " << j << " " << mass_mat_ordered.coeffRef(i,j) << "\n";
+      if(bound_mat_ordered.coeffRef(i,j) != 0){
+        ordered_bound_mat << i << " " << j << " " << bound_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  ordered_mass_mat.close();
+  ordered_bound_mat.close();
+
+  // Nodes not on the boundary
+
+  ofstream ordered_not_bound_mat;
+  ordered_not_bound_mat.open("ordered_not_bound_mat.txt");
+  if(ordered_not_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  ordered_not_bound_mat << mesh_test.num_points<< "\n";
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(not_bound_mat_ordered.coeffRef(i,j) != 0){
+        ordered_not_bound_mat << i << " " << j << " " << not_bound_mat_ordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  ordered_not_bound_mat.close();
 
   print_status(1 == 1, "massMatrix");
 }
@@ -247,45 +291,86 @@ void test_stiffnessMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> stiff_mat_unordered(mesh_test.num_points, mesh_test.num_points);
+  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
-  mesh_test.stiffness_matrix(rand_func, stiff_mat_unordered);
+  mesh_test.stiffness_matrix(rand_func, bound_mat_unordered, not_bound_mat_unordered);
 
-  ofstream unordered_stiff_mat;
-  unordered_stiff_mat.open("unordered_stiff_mat.txt");
-  if(unordered_stiff_mat.is_open() == false){
+  // Nodes on the boundary
+
+  ofstream unordered_bound_mat;
+  unordered_bound_mat.open("unordered_bound_mat.txt");
+  if(unordered_bound_mat.is_open() == false){
     cout << "Unable to open file" << endl << std::flush;
   }
-    unordered_stiff_mat << mesh_test.num_points<< "\n";
+  unordered_bound_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      if(stiff_mat_unordered.coeffRef(i,j) != 0){
-        unordered_stiff_mat << i << " " << j << " " << stiff_mat_unordered.coeffRef(i,j) << "\n";
+      if(bound_mat_unordered.coeffRef(i,j) != 0){
+        unordered_bound_mat << i << " " << j << " " << bound_mat_unordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  unordered_stiff_mat.close();
+  unordered_bound_mat.close();
 
-  SparseMatrix<double, RowMajor, int> stiff_mat_ordered(mesh_test.num_points, mesh_test.num_points);
+  // Nodes not on the boundary
+
+  ofstream unordered_not_bound_mat;
+  unordered_not_bound_mat.open("unordered_not_bound_mat.txt");
+  if(unordered_not_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  unordered_not_bound_mat << mesh_test.num_points<< "\n";
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(not_bound_mat_unordered.coeffRef(i,j) != 0){
+        unordered_not_bound_mat << i << " " << j << " " << not_bound_mat_unordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  unordered_not_bound_mat.close();
+
+  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
-  mesh_test.stiffness_matrix(rand_func, stiff_mat_ordered);
+  mesh_test.stiffness_matrix(rand_func, bound_mat_ordered, not_bound_mat_ordered);
 
-  ofstream ordered_stiff_mat;
-  ordered_stiff_mat.open("ordered_stiff_mat.txt");
-  if(ordered_stiff_mat.is_open() == false){
-    cout << "Unable to open ordered_stiff_mat" << endl << std::flush;
+  // Nodes on the boundary
+
+  ofstream ordered_bound_mat;
+  ordered_bound_mat.open("ordered_bound_mat.txt");
+  if(ordered_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
   }
-    ordered_stiff_mat << mesh_test.num_points<< "\n";
+  ordered_bound_mat << mesh_test.num_points<< "\n";
   for(int i=0; i<30; i++){
     for(int j=0; j<30; j++){
-      if(stiff_mat_ordered.coeffRef(i,j) != 0){
-        ordered_stiff_mat << i << " " << j << " " << stiff_mat_ordered.coeffRef(i,j) << "\n";
+      if(bound_mat_ordered.coeffRef(i,j) != 0){
+        ordered_bound_mat << i << " " << j << " " << bound_mat_ordered.coeffRef(i,j) << "\n";
       }
     }
   }
-  ordered_stiff_mat.close();
+  ordered_bound_mat.close();
+
+  // Nodes not on the boundary
+
+  ofstream ordered_not_bound_mat;
+  ordered_not_bound_mat.open("ordered_not_bound_mat.txt");
+  if(ordered_not_bound_mat.is_open() == false){
+    cout << "Unable to open file" << endl << std::flush;
+  }
+  ordered_not_bound_mat << mesh_test.num_points<< "\n";
+  for(int i=0; i<30; i++){
+    for(int j=0; j<30; j++){
+      if(not_bound_mat_ordered.coeffRef(i,j) != 0){
+        ordered_not_bound_mat << i << " " << j << " " << not_bound_mat_ordered.coeffRef(i,j) << "\n";
+      }
+    }
+  }
+  ordered_not_bound_mat.close();
+
 
   print_status(1 ==1, "stiffnessMatrix");
 }
