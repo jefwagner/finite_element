@@ -190,53 +190,56 @@ void print_mesh( fstream &f, Mesh &m){
 
 void print_mat(Mesh &m, int center){
 
-	// Unordered Mass Matrix
-
-	SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	SparseMatrix<double, RowMajor, int> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
-
-	m.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
-	m.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
-
-	// Nodes on the boundary
-
-	ofstream unordered_bound_mat;
-  unordered_bound_mat.open("unordered_bound_mat.txt");
-  if(unordered_bound_mat.is_open() == false){
-    cout << "Unable to open unordered_bound_mat" << endl << std::flush;
-  }
-    unordered_bound_mat << m.num_points<< "\n";
-		for(int i=0; i<bound_mat_unordered.outerSize(); i++){
-			for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(bound_mat_unordered, i); it; ++it){
-				unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-			}
-		}
-  unordered_bound_mat.close();
-
-	// Nodes not on the boundary
-
-	ofstream unordered_not_bound_mat;
-	unordered_not_bound_mat.open("ordered_not_bound_mat.txt");
-	if(unordered_not_bound_mat.is_open() == false){
-		cout << "Unable to open ordered_not_bound_mat" << endl << std::flush;
-	}
-		unordered_not_bound_mat << m.num_points<< "\n";
-		for(int i=0; i<not_bound_mat_unordered.outerSize(); i++){
-			for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(not_bound_mat_unordered, i); it; ++it){
-				unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-			}
-		}
-	unordered_not_bound_mat.close();
+	// Used for testing to make sure everything was working.
+	// // Unordered Mass Matrix
+	//
+	// SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+	// SparseMatrix<double, RowMajor, int> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
+	//
+	// m.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
+	// m.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
+	//
+	// // Nodes on the boundary
+	//
+	// ofstream unordered_bound_mat;
+  // unordered_bound_mat.open("unordered_bound_mat.txt");
+  // if(unordered_bound_mat.is_open() == false){
+  //   cout << "Unable to open unordered_bound_mat" << endl << std::flush;
+  // }
+  //   unordered_bound_mat << m.num_points<< "\n";
+	// 	for(int i=0; i<bound_mat_unordered.outerSize(); i++){
+	// 		for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(bound_mat_unordered, i); it; ++it){
+	// 			unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+	// 		}
+	// 	}
+  // unordered_bound_mat.close();
+	//
+	// // Nodes not on the boundary
+	//
+	// ofstream unordered_not_bound_mat;
+	// unordered_not_bound_mat.open("ordered_not_bound_mat.txt");
+	// if(unordered_not_bound_mat.is_open() == false){
+	// 	cout << "Unable to open ordered_not_bound_mat" << endl << std::flush;
+	// }
+	// 	unordered_not_bound_mat << m.num_points<< "\n";
+	// 	for(int i=0; i<not_bound_mat_unordered.outerSize(); i++){
+	// 		for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(not_bound_mat_unordered, i); it; ++it){
+	// 			unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+	// 		}
+	// 	}
+	// unordered_not_bound_mat.close();
 
 	// Ordered Mass Matrix
 
-	SparseMatrix<double, RowMajor, int> bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_edges);
+	SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+	SparseMatrix<double, RowMajor, int> bound_mat_ordered(m.num_points-m.num_edges, m.num_edges);
 
   m.reorder_nodes(center);
 
   m.mass_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	cout << "Mass Matrix done!!" << endl;
 	m.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	cout << "Stiffness Matrix done!!" << endl;
 
 	// Nodes on the boundary
 

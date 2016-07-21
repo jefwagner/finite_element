@@ -717,6 +717,7 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 				}
 			}
 		}
+		// cout << "Triangles Processed(Mass): " << t << "/" << num_tris << endl << std::flush;
 	}
 	delete[] not_bound;
 	delete[] bound;
@@ -874,6 +875,7 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMa
 				}
 			}
 		}
+		// cout << "Triangles Processed(Stiffness): " << t << "/" << num_tris << endl << std::flush;
 	}
 	delete[] not_bound;
 	delete[] bound;
