@@ -236,6 +236,9 @@ void test_massMatrix(){
 
   // Ordered Nodes
 
+  mesh_test.bound = NULL;
+  mesh_test.not_bound == NULL;
+
   SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
   SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
 
@@ -322,6 +325,8 @@ void test_stiffnessMatrix(){
   cout << "unordered_not_bound_mat.txt finished writing." << endl;
   unordered_not_bound_mat.close();
 
+  mesh_test.bound = NULL;
+  mesh_test.not_bound = NULL;
 
   SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
   SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);

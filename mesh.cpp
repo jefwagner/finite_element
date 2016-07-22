@@ -50,6 +50,9 @@ Mesh::Mesh(triangulateio *in){
 	tris = new tri[num_tris];
 	edges = new edge[num_edges];
 
+	bound = NULL;
+	not_bound = NULL;
+
 	//Now to fill them
 	//----------------------------------------------
 	//First is the point list, assuming 2 doubles
@@ -101,6 +104,14 @@ Mesh::~Mesh(){
 	//	already freed.
 	if(edges != NULL){
 		delete edges;
+	}
+
+	if(not_bound != NULL){
+		delete[] not_bound;
+	}
+
+	if(bound != NULL){
+		delete[] bound;
 	}
 }
 
@@ -616,56 +627,61 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 
 	// Building the points not on the boundary array
 
-	int * not_bound = new int[num_points-num_edges];
-	for(int i=0; i<num_points-num_edges; i++){
-		not_bound[i] = -1;
-	}
+	if(not_bound == NULL){
+		not_bound = new int[num_points-num_edges];
 
-	for(int p=0; p<num_points; p++){
-		on_edge = false;
-		for(int e=0; e<num_edges; e++){
-			if(find_edge(p,e) != -1){
-				on_edge = true;
-			}
+		for(int i=0; i<num_points-num_edges; i++){
+			not_bound[i] = -1;
 		}
-		if(!on_edge){
-			for(int i=0; i<num_points - num_edges; i++){
-				if((not_bound[i] == p) && (not_bound[i] != -1)){
-					inside = true;
-					break;
+
+		for(int p=0; p<num_points; p++){
+			on_edge = false;
+			for(int e=0; e<num_edges; e++){
+				if(find_edge(p,e) != -1){
+					on_edge = true;
 				}
 			}
-			if(!inside){
-				int index = find_negative(not_bound);
-				not_bound[index] = p;
+			if(!on_edge){
+				for(int i=0; i<num_points - num_edges; i++){
+					if((not_bound[i] == p) && (not_bound[i] != -1)){
+						inside = true;
+						break;
+					}
+				}
+				if(!inside){
+					int index = find_negative(not_bound);
+					not_bound[index] = p;
+				}
 			}
 		}
 	}
 
 	// Building the points on the boundary array
 
-	int * bound = new int[num_edges];
-	for(int i=0; i<num_edges; i++){
-		bound[i] = -1;
-	}
-
-	for(int p=0; p<num_points; p++){
-		on_edge = false;
-		for(int e=0; e<num_edges; e++){
-			if(find_edge(p,e) != -1){
-				on_edge = true;
-			}
+	if(bound == NULL){
+		bound = new int[num_edges];
+		for(int i=0; i<num_edges; i++){
+			bound[i] = -1;
 		}
-		if(on_edge){
-			for(int i=0; i<num_edges; i++){
-				if((bound[i] == p) && (bound[i] != -1)){
-					inside = true;
-					break;
+
+		for(int p=0; p<num_points; p++){
+			on_edge = false;
+			for(int e=0; e<num_edges; e++){
+				if(find_edge(p,e) != -1){
+					on_edge = true;
 				}
 			}
-			if(!inside){
-				int index = find_negative(bound);
-				bound[index] = p;
+			if(on_edge){
+				for(int i=0; i<num_edges; i++){
+					if((bound[i] == p) && (bound[i] != -1)){
+						inside = true;
+						break;
+					}
+				}
+				if(!inside){
+					int index = find_negative(bound);
+					bound[index] = p;
+				}
 			}
 		}
 	}
@@ -719,8 +735,6 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 		}
 		// cout << "Triangles Processed(Mass): " << t << "/" << num_tris << endl << std::flush;
 	}
-	delete[] not_bound;
-	delete[] bound;
 }
 
 //###############################################
@@ -773,56 +787,60 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMa
 
 	// Building the points not on the boundary array
 
-	int * not_bound = new int[num_points-num_edges];
-	for(int i=0; i<num_points-num_edges; i++){
-		not_bound[i] = -1;
-	}
+	if(not_bound == NULL){
+		not_bound = new int[num_points-num_edges];
 
-	for(int p=0; p<num_points; p++){
-		on_edge = false;
-		for(int e=0; e<num_edges; e++){
-			if(find_edge(p,e) != -1){
-				on_edge = true;
-			}
+		for(int i=0; i<num_points-num_edges; i++){
+			not_bound[i] = -1;
 		}
-		if(!on_edge){
-			for(int i=0; i<num_points - num_edges; i++){
-				if((not_bound[i] == p) && (not_bound[i] != -1)){
-					inside = true;
-					break;
+
+		for(int p=0; p<num_points; p++){
+			on_edge = false;
+			for(int e=0; e<num_edges; e++){
+				if(find_edge(p,e) != -1){
+					on_edge = true;
 				}
 			}
-			if(!inside){
-				int index = find_negative(not_bound);
-				not_bound[index] = p;
+			if(!on_edge){
+				for(int i=0; i<num_points - num_edges; i++){
+					if((not_bound[i] == p) && (not_bound[i] != -1)){
+						inside = true;
+						break;
+					}
+				}
+				if(!inside){
+					int index = find_negative(not_bound);
+					not_bound[index] = p;
+				}
 			}
 		}
 	}
-
 	// Building the points on the boundary array
 
-	int * bound = new int[num_edges];
-	for(int i=0; i<num_edges; i++){
-		bound[i] = -1;
-	}
-
-	for(int p=0; p<num_points; p++){
-		on_edge = false;
-		for(int e=0; e<num_edges; e++){
-			if(find_edge(p,e) != -1){
-				on_edge = true;
-			}
+	if(bound == NULL){
+		bound = new int[num_edges];
+		for(int i=0; i<num_edges; i++){
+			bound[i] = -1;
 		}
-		if(on_edge){
-			for(int i=0; i<num_edges; i++){
-				if((bound[i] == p) && (bound[i] != -1)){
-					inside = true;
-					break;
+
+		for(int p=0; p<num_points; p++){
+			on_edge = false;
+			for(int e=0; e<num_edges; e++){
+				if(find_edge(p,e) != -1){
+					on_edge = true;
 				}
 			}
-			if(!inside){
-				int index = find_negative(bound);
-				bound[index] = p;
+			if(on_edge){
+				for(int i=0; i<num_edges; i++){
+					if((bound[i] == p) && (bound[i] != -1)){
+						inside = true;
+						break;
+					}
+				}
+				if(!inside){
+					int index = find_negative(bound);
+					bound[index] = p;
+				}
 			}
 		}
 	}
@@ -877,8 +895,6 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMa
 		}
 		// cout << "Triangles Processed(Stiffness): " << t << "/" << num_tris << endl << std::flush;
 	}
-	delete[] not_bound;
-	delete[] bound;
 }
 
 //###############################################

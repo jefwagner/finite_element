@@ -3,6 +3,9 @@
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
+//#include <Eigen/SparseCore>
+#include <Eigen/SparseCholesky>
+//#include <Eigen/CholmodSupport>
 
 #include "mesh.hpp"
 #include "triangle.hpp"
@@ -315,3 +318,28 @@ void print_mat(Mesh &m, int center){
 // 	ordered_stiff_mat.close();
 //
 // }
+
+VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
+	VectorXd ret(m.num_edges);
+	for(int i=0; i<m.num_edges; i++){
+		int index = m.bound[i];
+		Vector2d point = m.points[index];
+		ret[i] = func(point);
+	}
+	return ret;
+}
+
+VectorXd b_vector_builder(SparseMatrix<double, RowMajor, int> &a_ik, VectorXd w_k, Mesh &m){
+	VectorXd ret(m.num_points - m.num_edges);
+	ret = a_ik * w_k;
+	return ret;
+}
+
+VectorXd matrix_solver(SparseMatrix<double> &a_ij, VectorXd b){
+	VectorXd ret;
+
+	SimplicialLLT<SparseMatrix<double> > solver;
+	solver.compute(a_ij);
+	ret = solver.solve(b);
+	return ret;
+}

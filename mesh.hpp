@@ -74,6 +74,9 @@ public:
 	tri *tris;
 	int num_edges;
 	edge *edges;
+	int *not_bound;
+	int *bound;
+
 
 	//----------------------------------------------
 	// Added for mass_mat, integrate, and stiff_mat
