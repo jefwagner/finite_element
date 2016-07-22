@@ -16,8 +16,15 @@ void print_mesh( fstream &f, Mesh &m);
 
 // Added for SparseMatrix
 
-void print_mat( Mesh &m, int);
+void print_mat(Mesh &, SparseMatrix<double> &, SparseMatrix<double> &);
 // void print_stiff_mat(Mesh &m, int);
+
+// Added to evaluate Ax = b
+
+VectorXd w_k_builder(double(*func)(Vector2d), Mesh &);
+VectorXd b_vector_builder(SparseMatrix<double> &, VectorXd, Mesh &);
+VectorXd matrix_solver(SparseMatrix<double> &, VectorXd);
+
 
 
 #endif /* JW_FE_REGION */

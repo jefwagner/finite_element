@@ -6,6 +6,12 @@ double unitary(Vector2d x){
 	return 1.0;
 }
 
+namespace{
+	double func(Vector2d point){
+		return (1-point[0]-point[1]);
+	}
+}
+
 void test_region(){
 	tio *in;
 	tio *out;
@@ -47,7 +53,21 @@ void test_region(){
 	// std::cout << "end of orderd Mat" << std::endl;
 
 
-	print_mat(m, center);
+	SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+	SparseMatrix<double> bound_mat_ordered(m.num_points, m.num_points-m.num_edges);
+
+	m.reorder_nodes(center);
+
+	m.mass_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	cout << "Mass Matrix done!!" << endl;
+	m.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	cout << "Stiffness Matrix done!!" << endl;
+
+	print_mat(m, not_bound_mat_ordered, bound_mat_ordered);
+
+	VectorXd w_k;
+	w_k = w_k_builder(func, m);
+	VectorXd b = b_vector_builder(bound_mat_ordered, w_k, m);
 
 	// print_stiff_mat(m, center);
 

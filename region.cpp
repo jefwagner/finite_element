@@ -191,13 +191,13 @@ void print_mesh( fstream &f, Mesh &m){
 	f << endl;
 }
 
-void print_mat(Mesh &m, int center){
+void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatrix<double> &bound_mat_ordered){
 
 	// Used for testing to make sure everything was working.
 	// // Unordered Mass Matrix
 	//
-	// SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	// SparseMatrix<double, RowMajor, int> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
+	// SparseMatrix<double> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+	// SparseMatrix<double> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
 	//
 	// m.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 	// m.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
@@ -234,16 +234,6 @@ void print_mat(Mesh &m, int center){
 
 	// Ordered Mass Matrix
 
-	SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	SparseMatrix<double, RowMajor, int> bound_mat_ordered(m.num_points-m.num_edges, m.num_edges);
-
-  m.reorder_nodes(center);
-
-  m.mass_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
-	cout << "Mass Matrix done!!" << endl;
-	m.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
-	cout << "Stiffness Matrix done!!" << endl;
-
 	// Nodes on the boundary
 
   ofstream ordered_bound_mat;
@@ -253,8 +243,8 @@ void print_mat(Mesh &m, int center){
   }
     ordered_bound_mat << m.num_points<< "\n";
 		for(int i=0; i<bound_mat_ordered.outerSize(); i++){
-			for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(bound_mat_ordered, i); it; ++it){
-				ordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+			for(SparseMatrix<double>::InnerIterator it(bound_mat_ordered, i); it; ++it){
+				ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
 			}
 		}
   ordered_bound_mat.close();
@@ -268,8 +258,8 @@ void print_mat(Mesh &m, int center){
 	}
 		ordered_not_bound_mat << m.num_points<< "\n";
 		for(int i=0; i<not_bound_mat_ordered.outerSize(); i++){
-			for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(not_bound_mat_ordered, i); it; ++it){
-				ordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+			for(SparseMatrix<double>::InnerIterator it(not_bound_mat_ordered, i); it; ++it){
+				ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
 			}
 		}
 	ordered_not_bound_mat.close();
@@ -279,7 +269,7 @@ void print_mat(Mesh &m, int center){
 //
 // 	// Unordered Stiffness Matrix
 //
-// 	SparseMatrix<double, RowMajor, int> stiff_mat_unordered(m.num_points, m.num_points);
+// 	SparseMatrix<double> stiff_mat_unordered(m.num_points, m.num_points);
 //
 // 	m.stiffness_matrix(func, stiff_mat_unordered);
 //
@@ -298,7 +288,7 @@ void print_mat(Mesh &m, int center){
 //
 // 	// Ordered Stiffness Matrix
 //
-// 	SparseMatrix<double, RowMajor, int> stiff_mat_ordered(m.num_points, m.num_points);
+// 	SparseMatrix<double> stiff_mat_ordered(m.num_points, m.num_points);
 //
 // 	m.reorder_nodes(center);
 //
@@ -329,7 +319,7 @@ VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
 	return ret;
 }
 
-VectorXd b_vector_builder(SparseMatrix<double, RowMajor, int> &a_ik, VectorXd w_k, Mesh &m){
+VectorXd b_vector_builder(SparseMatrix<double> &a_ik, VectorXd w_k, Mesh &m){
 	VectorXd ret(m.num_points - m.num_edges);
 	ret = a_ik * w_k;
 	return ret;

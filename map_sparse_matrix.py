@@ -12,9 +12,9 @@ def file_plot_data(filename):
             count = 0
             for word in line.split():
                 if (count == 0):
-                    row.append(int(word))
-                elif (count == 1):
                     col.append(int(word))
+                elif (count == 1):
+                    row.append(int(word))
                 else:
                     data.append(float(word))
                 count += 1

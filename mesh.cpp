@@ -616,7 +616,7 @@ int Mesh::find_bound(int n, int *bound){
 //	the density function to solve for a
 //	Sparse Matrix that will be used to find the
 //	work done.
-void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &bound_mat, SparseMatrix<double, RowMajor, int> &not_bound_mat){
+void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, SparseMatrix<double> &not_bound_mat){
 	int ii;
 	int jj;
 	int kk;
@@ -727,9 +727,9 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double, RowMajor, in
 				}
 
 				if(on_edge){
-					bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+					bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
 				} else if(add_to){
-					not_bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+					not_bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
 				}
 			}
 		}
@@ -776,7 +776,7 @@ Matrix2d Mesh::jacobian(Vector2d p0, Vector2d p1, Vector2d p2){
 //	the stiffness function to solve for a
 //	Sparse Matrix that will be used to find the
 //	work done.
-void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMajor, int> &bound_mat, SparseMatrix<double, RowMajor, int> &not_bound_mat){
+void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &bound_mat, SparseMatrix<double> &not_bound_mat){
 	int ii;
 	int jj;
 	int kk;
@@ -887,9 +887,9 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double, RowMa
 				}
 
 				if(on_edge){
-					bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+					bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
 				} else if(add_to){
-					not_bound_mat.coeffRef(row, col) += node_element * ref_tri.jac();
+					not_bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
 				}
 			}
 		}

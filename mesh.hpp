@@ -107,8 +107,8 @@ public:
 	void to_triangulateio( triangulateio *out);
 	void reorder_nodes( int);
 	double integrate( double(*func)(Vector2d));
-	void mass_matrix( double(*rho)(Vector2d), SparseMatrix<double, RowMajor, int> &, SparseMatrix<double, RowMajor, int> &);
-	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double, RowMajor, int> &, SparseMatrix<double, RowMajor, int> &);
+	void mass_matrix( double(*rho)(Vector2d), SparseMatrix<double> &, SparseMatrix<double> &);
+	void stiffness_matrix( double(*a)(Vector2d), SparseMatrix<double> &, SparseMatrix<double> &);
 
 	//----------------------------------------------
 	// Methods created for reorder_nodes

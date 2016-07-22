@@ -197,8 +197,8 @@ void test_massMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
@@ -211,8 +211,8 @@ void test_massMatrix(){
   }
   unordered_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_unordered,k); it; ++it){
-      unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(bound_mat_unordered,k); it; ++it){
+      unordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "unordered_bound_mat.txt finished writing." << endl;
@@ -227,8 +227,8 @@ void test_massMatrix(){
   }
   unordered_not_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<not_bound_mat_unordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
-      unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
+      unordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "unordered_not_bound_mat.txt finished writing." << endl;
@@ -239,8 +239,8 @@ void test_massMatrix(){
   mesh_test.bound = NULL;
   mesh_test.not_bound == NULL;
 
-  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_ordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
@@ -255,8 +255,8 @@ void test_massMatrix(){
   }
   ordered_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<bound_mat_ordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_ordered,k); it; ++it){
-      ordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(bound_mat_ordered,k); it; ++it){
+      ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "ordered_bound_mat.txt finished writing." << endl;
@@ -271,8 +271,8 @@ void test_massMatrix(){
   }
   ordered_not_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<not_bound_mat_ordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
-      ordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
+      ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "ordered_not_bound_mat.txt finished writing." << endl;
@@ -288,8 +288,8 @@ void test_stiffnessMatrix(){
 
   Mesh mesh_test(&my_tio);
 
-  SparseMatrix<double, RowMajor, int> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
@@ -302,8 +302,8 @@ void test_stiffnessMatrix(){
   }
   unordered_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_unordered,k); it; ++it){
-      unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(bound_mat_unordered,k); it; ++it){
+      unordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "unordered_bound_mat.txt finished writing." << endl;
@@ -318,8 +318,8 @@ void test_stiffnessMatrix(){
   }
   unordered_not_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<not_bound_mat_unordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
-      unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(not_bound_mat_unordered,k); it; ++it){
+      unordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "unordered_not_bound_mat.txt finished writing." << endl;
@@ -328,8 +328,8 @@ void test_stiffnessMatrix(){
   mesh_test.bound = NULL;
   mesh_test.not_bound = NULL;
 
-  SparseMatrix<double, RowMajor, int> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double, RowMajor, int> bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_edges);
+  SparseMatrix<double> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_ordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
@@ -344,8 +344,8 @@ void test_stiffnessMatrix(){
   }
   ordered_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<bound_mat_ordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(bound_mat_ordered,k); it; ++it){
-      ordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(bound_mat_ordered,k); it; ++it){
+      ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "ordered_bound_mat.txt finished writing." << endl;
@@ -360,8 +360,8 @@ void test_stiffnessMatrix(){
   }
   ordered_not_bound_mat << mesh_test.num_points<< "\n";
   for(int k=0; k<not_bound_mat_ordered.outerSize(); ++k){
-    for(SparseMatrix<double, RowMajor>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
-      ordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
+    for(SparseMatrix<double>::InnerIterator it(not_bound_mat_ordered,k); it; ++it){
+      ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
   cout << "ordered_not_bound_mat.txt finished writing." << endl;
