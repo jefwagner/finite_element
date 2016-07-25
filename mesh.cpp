@@ -629,62 +629,43 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, 
 
 	if(not_bound == NULL){
 		not_bound = new int[num_points-num_edges];
-
-		for(int i=0; i<num_points-num_edges; i++){
-			not_bound[i] = -1;
-		}
-
-		for(int p=0; p<num_points; p++){
-			on_edge = false;
-			for(int e=0; e<num_edges; e++){
-				if(find_edge(p,e) != -1){
-					on_edge = true;
-				}
-			}
-			if(!on_edge){
-				for(int i=0; i<num_points - num_edges; i++){
-					if((not_bound[i] == p) && (not_bound[i] != -1)){
-						inside = true;
-						break;
-					}
-				}
-				if(!inside){
-					int index = find_negative(not_bound);
-					not_bound[index] = p;
-				}
-			}
-		}
 	}
-
-	// Building the points on the boundary array
-
 	if(bound == NULL){
 		bound = new int[num_edges];
-		for(int i=0; i<num_edges; i++){
-			bound[i] = -1;
-		}
+	}
 
-		for(int p=0; p<num_points; p++){
-			on_edge = false;
-			for(int e=0; e<num_edges; e++){
-				if(find_edge(p,e) != -1){
-					on_edge = true;
+	for(int i=0; i<num_points-num_edges; i++){
+		not_bound[i] = -1;
+	}
+	for(int i=0; i<num_edges; i++){
+		bound[i] = -1;
+	}
+
+	for(int p=0; p<num_points; p++){
+		on_edge = false;
+		for(int e=0; e<num_edges; e++){
+			if(find_edge(p,e) != -1){
+				on_edge = true;
+				break;
+			}
+		}
+		if(!on_edge){
+			for(int i=0; i<num_points - num_edges; i++){
+				if(not_bound[i] == -1){
+					not_bound[i] = p;
+					break;
 				}
 			}
-			if(on_edge){
-				for(int i=0; i<num_edges; i++){
-					if((bound[i] == p) && (bound[i] != -1)){
-						inside = true;
-						break;
-					}
-				}
-				if(!inside){
-					int index = find_negative(bound);
-					bound[index] = p;
+		} else {
+			for(int i=0; i<num_edges; i++){
+				if(bound[i] == -1){
+					bound[i] = p;
+					break;
 				}
 			}
 		}
 	}
+
 
 	// This has a very similar set up to the Guassian
 	//	Legrangian integration described above. This
@@ -782,64 +763,44 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 	int kk;
 	double node_element;
 	bool on_edge, add_to;
-	bool inside;
 	int row, col;
 
 	// Building the points not on the boundary array
 
 	if(not_bound == NULL){
 		not_bound = new int[num_points-num_edges];
-
-		for(int i=0; i<num_points-num_edges; i++){
-			not_bound[i] = -1;
-		}
-
-		for(int p=0; p<num_points; p++){
-			on_edge = false;
-			for(int e=0; e<num_edges; e++){
-				if(find_edge(p,e) != -1){
-					on_edge = true;
-				}
-			}
-			if(!on_edge){
-				for(int i=0; i<num_points - num_edges; i++){
-					if((not_bound[i] == p) && (not_bound[i] != -1)){
-						inside = true;
-						break;
-					}
-				}
-				if(!inside){
-					int index = find_negative(not_bound);
-					not_bound[index] = p;
-				}
-			}
-		}
 	}
-	// Building the points on the boundary array
-
 	if(bound == NULL){
 		bound = new int[num_edges];
-		for(int i=0; i<num_edges; i++){
-			bound[i] = -1;
-		}
+	}
 
-		for(int p=0; p<num_points; p++){
-			on_edge = false;
-			for(int e=0; e<num_edges; e++){
-				if(find_edge(p,e) != -1){
-					on_edge = true;
+	for(int i=0; i<num_points-num_edges; i++){
+		not_bound[i] = -1;
+	}
+	for(int i=0; i<num_edges; i++){
+		bound[i] = -1;
+	}
+
+	for(int p=0; p<num_points; p++){
+		on_edge = false;
+		for(int e=0; e<num_edges; e++){
+			if(find_edge(p,e) != -1){
+				on_edge = true;
+				break;
+			}
+		}
+		if(!on_edge){
+			for(int i=0; i<num_points - num_edges; i++){
+				if(not_bound[i] == -1){
+					not_bound[i] = p;
+					break;
 				}
 			}
-			if(on_edge){
-				for(int i=0; i<num_edges; i++){
-					if((bound[i] == p) && (bound[i] != -1)){
-						inside = true;
-						break;
-					}
-				}
-				if(!inside){
-					int index = find_negative(bound);
-					bound[index] = p;
+		} else {
+			for(int i=0; i<num_edges; i++){
+				if(bound[i] == -1){
+					bound[i] = p;
+					break;
 				}
 			}
 		}

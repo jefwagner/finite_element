@@ -22,8 +22,10 @@ void print_mat(Mesh &, SparseMatrix<double> &, SparseMatrix<double> &);
 // Added to evaluate Ax = b
 
 VectorXd w_k_builder(double(*func)(Vector2d), Mesh &);
-VectorXd b_vector_builder(SparseMatrix<double> &, VectorXd, Mesh &);
+VectorXd b_vector_builder(SparseMatrix<double> &, VectorXd);
 VectorXd matrix_solver(SparseMatrix<double> &, VectorXd);
+VectorXd w_stitcher(VectorXd, VectorXd, Mesh &);
+
 
 
 

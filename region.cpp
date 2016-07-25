@@ -319,10 +319,10 @@ VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
 	return ret;
 }
 
-VectorXd b_vector_builder(SparseMatrix<double> &a_ik, VectorXd w_k, Mesh &m){
-	VectorXd ret(m.num_points - m.num_edges);
-	ret = a_ik * w_k;
-	return ret;
+VectorXd b_vector_builder(SparseMatrix<double> &a_ik, VectorXd w_k){
+	cout << "Size of a_ik is " << a_ik.rows() << "x" << a_ik.cols() << endl;
+	cout << "Size of w_k is " << w_k.size() << endl;
+	return a_ik.transpose() * w_k;
 }
 
 VectorXd matrix_solver(SparseMatrix<double> &a_ij, VectorXd b){
@@ -331,5 +331,26 @@ VectorXd matrix_solver(SparseMatrix<double> &a_ij, VectorXd b){
 	SimplicialLLT<SparseMatrix<double> > solver;
 	solver.compute(a_ij);
 	ret = solver.solve(b);
+	return ret;
+}
+
+VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
+	int i=0;
+	int j=0;
+	int b=0;
+	VectorXd ret(m.num_points);
+
+	for(b=0; b<m.num_points; b++){
+		if(b == m.bound[i]){
+			ret[b] = w_ik[i];
+			i++;
+		} else if(b == m.not_bound[j]){
+			ret[b] = w_ij[j];
+			j++;
+		} else {
+			cout << "Error in w_switcher at point p: " << b << endl;
+		}
+	}
+
 	return ret;
 }

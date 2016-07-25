@@ -3,6 +3,7 @@
 #include <fstream>
 #include "test.hpp"
 #include "mesh.hpp"
+#include "region.hpp"
 #include "testbuilder.hpp"
 #include "triangle.hpp"
 
@@ -198,7 +199,7 @@ void test_massMatrix(){
   Mesh mesh_test(&my_tio);
 
   SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double> bound_mat_unordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
@@ -240,7 +241,7 @@ void test_massMatrix(){
   mesh_test.not_bound == NULL;
 
   SparseMatrix<double> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double> bound_mat_ordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_ordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 
@@ -278,6 +279,14 @@ void test_massMatrix(){
   cout << "ordered_not_bound_mat.txt finished writing." << endl;
   ordered_not_bound_mat.close();
 
+  VectorXd w_k, w_ij, w;
+  w_k = w_k_builder(func, mesh_test);
+  VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
+  w_ij = matrix_solver(not_bound_mat_ordered, b);
+  w = w_stitcher(w_k, w_ij, mesh_test);
+
+  // print_stiff_mat(m, center);
+
   print_status(1 == 1, "massMatrix");
 }
 
@@ -289,7 +298,7 @@ void test_stiffnessMatrix(){
   Mesh mesh_test(&my_tio);
 
   SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double> bound_mat_unordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
 
@@ -329,7 +338,7 @@ void test_stiffnessMatrix(){
   mesh_test.not_bound = NULL;
 
   SparseMatrix<double> not_bound_mat_ordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
-  SparseMatrix<double> bound_mat_ordered(mesh_test.num_points, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_ordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
 
   mesh_test.reorder_nodes(12);
 

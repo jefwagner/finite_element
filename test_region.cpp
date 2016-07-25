@@ -54,7 +54,7 @@ void test_region(){
 
 
 	SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	SparseMatrix<double> bound_mat_ordered(m.num_points, m.num_points-m.num_edges);
+	SparseMatrix<double> bound_mat_ordered(m.num_edges, m.num_points-m.num_edges);
 
 	m.reorder_nodes(center);
 
@@ -65,9 +65,11 @@ void test_region(){
 
 	print_mat(m, not_bound_mat_ordered, bound_mat_ordered);
 
-	VectorXd w_k;
+	VectorXd w_k, w_ij, w;
 	w_k = w_k_builder(func, m);
-	VectorXd b = b_vector_builder(bound_mat_ordered, w_k, m);
+	VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
+	w_ij = matrix_solver(not_bound_mat_ordered, b);
+	w = w_stitcher(w_k, w_ij, m);
 
 	// print_stiff_mat(m, center);
 
