@@ -8,11 +8,12 @@ double unitary(Vector2d x){
 
 namespace{
 	double func(Vector2d point){
-		return (1-point[0]-point[1]);
+		return (5.0-point[0]-point[1]);
+		// return 1.0;
 	}
 }
 
-void test_region(){
+void _test_region(){
 	tio *in;
 	tio *out;
 	tio *vor;
@@ -31,27 +32,10 @@ void test_region(){
 	triangulate(triswitches, in, out, vor);
 	Mesh m(out);
 
-	// SparseMatrix<double, RowMajor, int> sp1(m.num_points, m.num_points);
-	// SparseMatrix<double, RowMajor, int> sp2(m.num_points, m.num_points);
-
 	fstream f("region_mesh.txt", fstream::out);
 	print_mesh( f, m);
 
 	int center = 12;
-	// std::cout << "Start of Unorderd Mat" << std::endl;
-	// std::cout << std::endl;
-	// m.mass_matrix(unitary, sp1);
-	// std::cout << std::endl;
-	// std::cout << "end of Unorderd Mat" << std::endl;
-	//
-	// m.reorder_nodes(0);
-	//
-	// std::cout << "Start of orderd Mat" << std::endl;
-	// std::cout << std::endl;
-	// m.mass_matrix(unitary, sp2);
-	// std::cout << std::endl;
-	// std::cout << "end of orderd Mat" << std::endl;
-
 
 	SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
 	SparseMatrix<double> bound_mat_ordered(m.num_edges, m.num_points-m.num_edges);
@@ -63,15 +47,26 @@ void test_region(){
 	m.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
 	cout << "Stiffness Matrix done!!" << endl;
 
+	// Build bound_mat_ordered nad not_bound_mat_ordered.
+
 	print_mat(m, not_bound_mat_ordered, bound_mat_ordered);
+
+	// Solving for w.
 
 	VectorXd w_k, w_ij, w;
 	w_k = w_k_builder(func, m);
 	VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
 	w_ij = matrix_solver(not_bound_mat_ordered, b);
 	w = w_stitcher(w_k, w_ij, m);
-
-	// print_stiff_mat(m, center);
+	//
+	// for(int i=0; i<m.num_points; i++){
+	// 	cout << w[i] << endl;
+	// 	for(int j=0; j<(m.num_points - m.num_edges); j++){
+	// 		if(m.not_bound[j] == i){
+	// 			cout << "In not_bound" << endl;
+	// 		}
+	// 	}
+	// }
 
 	print_status( 1==1, "Region");
 }

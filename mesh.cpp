@@ -574,7 +574,7 @@ double Mesh::integrate(double(*func)(Vector2d)){
 //	not_bound if it is an element of not_bound,
 //	else return -1.
 
-int Mesh::find_not_bound(int n, int *not_bound){
+int Mesh::find_not_bound(int n){
 	int b;
 
 	// Go through each element in not bound, b,
@@ -595,7 +595,7 @@ int Mesh::find_not_bound(int n, int *not_bound){
 //	bound if it is an element of bound,
 //	else return -1.
 
-int Mesh::find_bound(int n, int *bound){
+int Mesh::find_bound(int n){
 	int b;
 
 	// Go through each element in bound, b,
@@ -622,10 +622,13 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, 
 	int kk;
 	double node_element;
 	bool on_edge, add_to;
-	bool inside;
 	int row, col;
 
-	// Building the points not on the boundary array
+	// Building array of points not on the boundary
+	// 	 array and the points on the boundary array.
+	// It will also check to see if bound and
+	// 	not_bound are initialized and if they are
+	// 	not, it will initialize them.
 
 	if(not_bound == NULL){
 		not_bound = new int[num_points-num_edges];
@@ -694,23 +697,23 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, 
 				}
 
 				for(int e=0; e<num_edges; e++){
-					if((find_edge(tris[t][j], e) != -1) && (find_not_bound(tris[t][i], not_bound) != -1)){
+					if((find_edge(tris[t][j], e) != -1) && (find_not_bound(tris[t][i]) != -1)){
 							on_edge = true;
-							col = find_bound(tris[t][j], bound);
-							row = find_not_bound(tris[t][i], not_bound);
+							col = find_bound(tris[t][j]);
+							row = find_not_bound(tris[t][i]);
 							break;
-					} else if((find_not_bound(tris[t][i], not_bound) != -1) && (find_not_bound(tris[t][j], not_bound) != -1)){
+					} else if((find_not_bound(tris[t][i]) != -1) && (find_not_bound(tris[t][j]) != -1)){
 						add_to = true;
-						row = find_not_bound(tris[t][i], not_bound);
-						col = find_not_bound(tris[t][j], not_bound);
+						row = find_not_bound(tris[t][i]);
+						col = find_not_bound(tris[t][j]);
 						break;
 					}
 				}
 
 				if(on_edge){
-					bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
+					bound_mat.coeffRef(col, row) += node_element * std::abs(ref_tri.jac());
 				} else if(add_to){
-					not_bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
+					not_bound_mat.coeffRef(col, row) += node_element * std::abs(ref_tri.jac());
 				}
 			}
 		}
@@ -740,14 +743,14 @@ Matrix2d Mesh::jacobian(Vector2d p0, Vector2d p1, Vector2d p2){
 	grad_b = p2[0] - p0[0];
 	grad_c = p1[1] - p0[1];
 	grad_d = p2[1] - p0[1];
-	grad_const = 1./((grad_a * grad_d) - (grad_b * grad_c));
+	grad_const = (grad_a * grad_d) - (grad_b * grad_c);
 
 	Matrix2d jacobian;
 
-	jacobian(0,0) = grad_d/grad_const;
-	jacobian(0,1) = -grad_c/grad_const;
-	jacobian(1,0) = -grad_b/grad_const;
-	jacobian(1,1) = grad_a/grad_const;
+	jacobian(0,1) = grad_d/grad_const;
+	jacobian(1,1) = -grad_c/grad_const;
+	jacobian(0,0) = -grad_b/grad_const;
+	jacobian(1,0) = grad_a/grad_const;
 
 	return jacobian;
 }
@@ -765,7 +768,11 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 	bool on_edge, add_to;
 	int row, col;
 
-	// Building the points not on the boundary array
+	// Building array of points not on the boundary
+	// 	 array and the points on the boundary array.
+	// It will also check to see if bound and
+	// 	not_bound are initialized and if they are
+	// 	not, it will initialize them.
 
 	if(not_bound == NULL){
 		not_bound = new int[num_points-num_edges];
@@ -818,43 +825,50 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 
 		// This must be done in Xi-Eta space.
 		FromRefTri ref_tri(p0, p1, p2);
+		Matrix2d jacob = jacobian(p0, p1, p2);
+		cout << "triangle: " << t << endl;
+
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
+				row = -1;
+				col = -1;
 				node_element = 0;
 				on_edge = false;
 				add_to = false;
-				for(int k=0; k<4; k++){
-					Matrix2d jacob = jacobian(p0, p1, p2);
 
-					// grad_v is transposed in the first part
-					//	because Eigen is a column major lib,
-					//	so Vector2d is a 2 by 1 and not a
-					//	1 by 2.
-					double gradient = ((grad_v[i].transpose() * jacob) * (jacob.transpose() * grad_v[j]));
-					node_element += weight[k] * stiff(ref_tri(xieta[k])) * gradient;
+				// grad_v is transposed in the first part
+				//	because Eigen is a column major lib,
+				//	so Vector2d is a 2 by 1 and not a
+				//	1 by 2.
+				double gradient = (grad_v[i].transpose() * jacob) * (jacob.transpose() * grad_v[j]);
+
+				for(int k=0; k<4; k++){
+
+					node_element += .5 * weight[k] * stiff(ref_tri(xieta[k])) * gradient;
+					cout << t << " " << i << " "<< j << " " << k << "\t" << node_element << endl;
 				}
-				for(int e=0; e<num_edges; e++){
-					if((find_edge(tris[t][j], e) != -1) && (find_not_bound(tris[t][i], not_bound) != -1)){
-							on_edge = true;
-							col = find_bound(tris[t][j], bound);
-							row = find_not_bound(tris[t][i], not_bound);
-							break;
-					} else if((find_not_bound(tris[t][i], not_bound) != -1) && (find_not_bound(tris[t][j], not_bound) != -1)){
-						add_to = true;
-						row = find_not_bound(tris[t][i], not_bound);
-						col = find_not_bound(tris[t][j], not_bound);
-						break;
-					}
+
+				if((find_bound(tris[t][i]) != -1) && (find_not_bound(tris[t][j]) != -1)){
+					// cout << "i: " << tris[t][i] << endl;
+					// cout << "j: " << tris[t][j] << endl;
+					on_edge = true;
+					col = find_bound(tris[t][i]);
+					row = find_not_bound(tris[t][j]);
+				} else if((find_not_bound(tris[t][i]) != -1) && (find_not_bound(tris[t][j]) != -1)){
+					add_to = true;
+					row = find_not_bound(tris[t][j]);
+					col = find_not_bound(tris[t][i]);
 				}
+
 
 				if(on_edge){
-					bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
+					bound_mat.coeffRef(col, row) += node_element * std::abs(ref_tri.jac());
+					cout << "Bound: " << col << " " << row << " " << node_element * std::abs(ref_tri.jac()) << endl;
 				} else if(add_to){
-					not_bound_mat.coeffRef(col, row) += node_element * ref_tri.jac();
+					not_bound_mat.coeffRef(col, row) += node_element * std::abs(ref_tri.jac());
 				}
 			}
 		}
-		// cout << "Triangles Processed(Stiffness): " << t << "/" << num_tris << endl << std::flush;
 	}
 }
 

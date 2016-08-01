@@ -17,7 +17,6 @@ void print_mesh( fstream &f, Mesh &m);
 // Added for SparseMatrix
 
 void print_mat(Mesh &, SparseMatrix<double> &, SparseMatrix<double> &);
-// void print_stiff_mat(Mesh &m, int);
 
 // Added to evaluate Ax = b
 

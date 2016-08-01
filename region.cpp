@@ -121,14 +121,18 @@ void fill_pslg(tio *in, double d, double r1, double r2){
 	pml = in->pointmarkerlist;
 	sl = in->segmentlist;
 	sml = in->segmentmarkerlist;
-	// Four corners of surrounding box
 
 	first = n;
+
+	// Outer Shape of the mesh: an elipse
+	// 	-The shape comes from the last
+	// 		2 parameters in add_point()
 
 	for(i=0; i<56; i++){
 		double theta = 2*PI*i/56;
 		add_point(pl, &n, 1.5*d*cos(theta), d*sin(theta));
 	}
+	// Four corners of surrounding box
 
 	// add_point(pl, &n, 1.5*d, d);
 	// add_point(pl, &n, 1.5*d, -d);
@@ -193,45 +197,6 @@ void print_mesh( fstream &f, Mesh &m){
 
 void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatrix<double> &bound_mat_ordered){
 
-	// Used for testing to make sure everything was working.
-	// // Unordered Mass Matrix
-	//
-	// SparseMatrix<double> not_bound_mat_unordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
-	// SparseMatrix<double> bound_mat_unordered(m.num_points-m.num_edges, m.num_edges);
-	//
-	// m.mass_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
-	// m.stiffness_matrix(func, bound_mat_unordered, not_bound_mat_unordered);
-	//
-	// // Nodes on the boundary
-	//
-	// ofstream unordered_bound_mat;
-  // unordered_bound_mat.open("unordered_bound_mat.txt");
-  // if(unordered_bound_mat.is_open() == false){
-  //   cout << "Unable to open unordered_bound_mat" << endl << std::flush;
-  // }
-  //   unordered_bound_mat << m.num_points<< "\n";
-	// 	for(int i=0; i<bound_mat_unordered.outerSize(); i++){
-	// 		for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(bound_mat_unordered, i); it; ++it){
-	// 			unordered_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-	// 		}
-	// 	}
-  // unordered_bound_mat.close();
-	//
-	// // Nodes not on the boundary
-	//
-	// ofstream unordered_not_bound_mat;
-	// unordered_not_bound_mat.open("ordered_not_bound_mat.txt");
-	// if(unordered_not_bound_mat.is_open() == false){
-	// 	cout << "Unable to open ordered_not_bound_mat" << endl << std::flush;
-	// }
-	// 	unordered_not_bound_mat << m.num_points<< "\n";
-	// 	for(int i=0; i<not_bound_mat_unordered.outerSize(); i++){
-	// 		for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(not_bound_mat_unordered, i); it; ++it){
-	// 			unordered_not_bound_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-	// 		}
-	// 	}
-	// unordered_not_bound_mat.close();
-
 	// Ordered Mass Matrix
 
 	// Nodes on the boundary
@@ -265,50 +230,6 @@ void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatri
 	ordered_not_bound_mat.close();
 }
 
-// void print_stiff_mat(Mesh &m, int center){
-//
-// 	// Unordered Stiffness Matrix
-//
-// 	SparseMatrix<double> stiff_mat_unordered(m.num_points, m.num_points);
-//
-// 	m.stiffness_matrix(func, stiff_mat_unordered);
-//
-// 	ofstream unordered_stiff_mat;
-// 	unordered_stiff_mat.open("unordered_stiff_mat.txt");
-// 	if(unordered_stiff_mat.is_open() == false){
-// 		cout << "Unable to open file" << endl << std::flush;
-// 	}
-// 		unordered_stiff_mat << m.num_points<< "\n";
-// 	for(int i=0; i<stiff_mat_unordered.outerSize(); i++){
-// 		for(SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(stiff_mat_unordered, i); it; ++it){
-// 			unordered_stiff_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-// 		}
-// 	}
-// 	unordered_stiff_mat.close();
-//
-// 	// Ordered Stiffness Matrix
-//
-// 	SparseMatrix<double> stiff_mat_ordered(m.num_points, m.num_points);
-//
-// 	m.reorder_nodes(center);
-//
-// 	m.stiffness_matrix(func, stiff_mat_ordered);
-//
-// 	ofstream ordered_stiff_mat;
-// 	ordered_stiff_mat.open("ordered_stiff_mat.txt");
-// 	if(ordered_stiff_mat.is_open() == false){
-// 		cout << "Unable to open ordered_stiff_mat" << endl << std::flush;
-// 	}
-// 		ordered_stiff_mat << m.num_points<< "\n";
-// 		for(int i=0; i<stiff_mat_ordered.outerSize(); i++){
-// 			for(SparseMatrix<double,RowMajor>::InnerIterator it(stiff_mat_ordered, i); it; ++it){
-// 				ordered_stiff_mat << it.row() << " " << it.col() << " " << it.value() << endl;
-// 			}
-// 		}
-// 	ordered_stiff_mat.close();
-//
-// }
-
 VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
 	VectorXd ret(m.num_edges);
 	for(int i=0; i<m.num_edges; i++){
@@ -320,9 +241,7 @@ VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
 }
 
 VectorXd b_vector_builder(SparseMatrix<double> &a_ik, VectorXd w_k){
-	cout << "Size of a_ik is " << a_ik.rows() << "x" << a_ik.cols() << endl;
-	cout << "Size of w_k is " << w_k.size() << endl;
-	return a_ik.transpose() * w_k;
+	return -1. * a_ik.transpose() * w_k;
 }
 
 VectorXd matrix_solver(SparseMatrix<double> &a_ij, VectorXd b){

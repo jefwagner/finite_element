@@ -77,7 +77,6 @@ public:
 	int *not_bound;
 	int *bound;
 
-
 	//----------------------------------------------
 	// Added for mass_mat, integrate, and stiff_mat
 
@@ -159,8 +158,8 @@ public:
 	//----------------------------------------------
 	// Methods created for stiffness_matrix and
 	// 	mass_matrix.
-	int find_not_bound(int , int *);
-	int find_bound(int, int *);
+	int find_not_bound(int);
+	int find_bound(int);
 
 	//----------------------------------------------
 	// Methods created for stiffness_matrix:

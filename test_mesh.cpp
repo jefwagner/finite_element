@@ -14,14 +14,13 @@ using namespace std;
 namespace{
   double func(Vector2d point){
     double ret;
-    ret = point[0] * point[1];
+    ret = (point[0] * point[1]);
     return ret;
   }
 
-  double rand_func(Vector2d point){
+  double func_k(Vector2d point){
     double ret;
-    ret = rand() % 100;
-    // ret = 10 - (point[0] * point[0]) - (point[1] * point[1]);
+    ret = point[0] * point[1];
     return ret;
   }
 }
@@ -43,7 +42,6 @@ void test_constructor(){
     my_tio.pointlist[2*node + 0] = (double)(node%5);
     my_tio.pointlist[2*node + 1] = (double)(node/5);
   }
-  printf("Points filled \n");
 
   //Fill out triangle list
   my_tio.numberoftriangles = 40;
@@ -63,7 +61,6 @@ void test_constructor(){
         my_tio.trianglelist[(start/5) * 24 + 6 * i + 5] = start + i + 6;
       }
   }
-  printf("Triangles filled \n");
 
   //Fill out edge list
   my_tio.numberofsegments = 18;
@@ -104,7 +101,6 @@ void test_constructor(){
   my_tio.segmentlist[33] = 5;
   my_tio.segmentlist[34] = 5;
   my_tio.segmentlist[35] = 0;
-  printf("Edges filled \n");
 
   Mesh mesh_test(&my_tio);
 
@@ -178,13 +174,9 @@ void test_integrate(){
 
   Mesh mesh_test(&my_tio);
 
-  // print_status(1==1   ,"Mesh Constructor");//t e s t mesh constructor
-
   //Integration t e s t using a hemisphere
 
   double integral = mesh_test.integrate(func); // t e s t integration actual value ~16.75
-
-  cout << "Integrate = " << integral << endl;
 
   integral = round(integral);
 
@@ -216,7 +208,6 @@ void test_massMatrix(){
       unordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "unordered_bound_mat.txt finished writing." << endl;
   unordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -232,7 +223,6 @@ void test_massMatrix(){
       unordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "unordered_not_bound_mat.txt finished writing." << endl;
   unordered_not_bound_mat.close();
 
   // Ordered Nodes
@@ -260,7 +250,6 @@ void test_massMatrix(){
       ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "ordered_bound_mat.txt finished writing." << endl;
   ordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -276,16 +265,7 @@ void test_massMatrix(){
       ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "ordered_not_bound_mat.txt finished writing." << endl;
   ordered_not_bound_mat.close();
-
-  VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func, mesh_test);
-  VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
-  w_ij = matrix_solver(not_bound_mat_ordered, b);
-  w = w_stitcher(w_k, w_ij, mesh_test);
-
-  // print_stiff_mat(m, center);
 
   print_status(1 == 1, "massMatrix");
 }
@@ -315,7 +295,6 @@ void test_stiffnessMatrix(){
       unordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "unordered_bound_mat.txt finished writing." << endl;
   unordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -331,7 +310,6 @@ void test_stiffnessMatrix(){
       unordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "unordered_not_bound_mat.txt finished writing." << endl;
   unordered_not_bound_mat.close();
 
   mesh_test.bound = NULL;
@@ -357,7 +335,6 @@ void test_stiffnessMatrix(){
       ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "ordered_bound_mat.txt finished writing." << endl;
   ordered_bound_mat.close();
 
   // Nodes not on the boundary
@@ -373,9 +350,74 @@ void test_stiffnessMatrix(){
       ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
     }
   }
-  cout << "ordered_not_bound_mat.txt finished writing." << endl;
   ordered_not_bound_mat.close();
 
-
   print_status(1 ==1, "stiffnessMatrix");
+}
+
+void test_k_matrix(){
+  double testk;
+  int testcount = 0;
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor_simple();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+
+  mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
+
+  for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
+    for(SparseMatrix<double>::InnerIterator it(bound_mat_unordered,k); it; ++it){
+      cout << it.col() << " " << it.row() << " " << it.value() << endl;
+      testk = it.value()/not_bound_mat_unordered.coeffRef(0,0);
+      cout << testk << endl;
+      if(testk == -0.25){
+        testcount++;
+      }
+    }
+  }
+  print_status(testcount >= 3, "k_matrix");
+}
+
+void _test_b_vector(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor_simple();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+
+  mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
+
+  VectorXd w_k, w_ij, w;
+  w_k = w_k_builder(func_k, mesh_test);
+  VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
+}
+
+void _test_w_solver(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor_simple();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+
+  mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
+
+  VectorXd w_k, w_ij, w;
+  w_k = w_k_builder(func_k, mesh_test);
+  VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
+  w_ij = matrix_solver(not_bound_mat_unordered, b);
+  w = w_stitcher(w_k, w_ij, mesh_test);
+
+  for(int i=0; i<mesh_test.num_points; i++){
+    cout << mesh_test.points[i] << ": " << w[i] << endl;
+  }
 }
