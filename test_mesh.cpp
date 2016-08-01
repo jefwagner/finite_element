@@ -19,9 +19,7 @@ namespace{
   }
 
   double func_k(Vector2d point){
-    double ret;
-    ret = point[0] * point[1];
-    return ret;
+    return 1;
   }
 }
 
@@ -371,18 +369,16 @@ void test_k_matrix(){
 
   for(int k=0; k<bound_mat_unordered.outerSize(); ++k){
     for(SparseMatrix<double>::InnerIterator it(bound_mat_unordered,k); it; ++it){
-      cout << it.col() << " " << it.row() << " " << it.value() << endl;
       testk = it.value()/not_bound_mat_unordered.coeffRef(0,0);
-      cout << testk << endl;
       if(testk == -0.25){
         testcount++;
       }
     }
   }
-  print_status(testcount >= 3, "k_matrix");
+  print_status(testcount == 4, "k_matrix");
 }
 
-void _test_b_vector(){
+void test_b_vector(){
   triangulateio my_tio;
 
   my_tio = mesh_constructor_simple();
@@ -399,7 +395,7 @@ void _test_b_vector(){
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
 }
 
-void _test_w_solver(){
+void test_w_solver(){
   triangulateio my_tio;
 
   my_tio = mesh_constructor_simple();
@@ -417,7 +413,5 @@ void _test_w_solver(){
   w_ij = matrix_solver(not_bound_mat_unordered, b);
   w = w_stitcher(w_k, w_ij, mesh_test);
 
-  for(int i=0; i<mesh_test.num_points; i++){
-    cout << mesh_test.points[i] << ": " << w[i] << endl;
-  }
+  print_status(w[4] == 1, "w_solver");
 }

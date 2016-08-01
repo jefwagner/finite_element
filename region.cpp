@@ -273,3 +273,19 @@ VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
 
 	return ret;
 }
+
+void print_w(VectorXd w, Mesh &m){
+	ofstream w_printed;
+	w_printed.open("w_vector.txt");
+	if(w_printed.is_open() == false){
+		cout << "Unable to open w_vector" << endl;
+	}
+
+	w_printed << m.num_points << endl;
+
+	for(int i=0; i<m.num_points; i++){
+		w_printed << i << " " << w[i] << endl;
+	}
+
+	w_printed.close();
+}

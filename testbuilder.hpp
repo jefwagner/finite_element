@@ -115,8 +115,8 @@ namespace{
     my_tio.trianglelist[4] = 3;
     my_tio.trianglelist[5] = 1;
     my_tio.trianglelist[6] = 4;
-    my_tio.trianglelist[7] = 2;
-    my_tio.trianglelist[8] = 0;
+    my_tio.trianglelist[7] = 0;
+    my_tio.trianglelist[8] = 2;
     my_tio.trianglelist[9] = 4;
     my_tio.trianglelist[10] = 3;
     my_tio.trianglelist[11] = 2;

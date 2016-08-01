@@ -13,7 +13,7 @@ namespace{
 	}
 }
 
-void _test_region(){
+void test_region(){
 	tio *in;
 	tio *out;
 	tio *vor;
@@ -42,9 +42,9 @@ void _test_region(){
 
 	m.reorder_nodes(center);
 
-	m.mass_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	m.mass_matrix(unitary, bound_mat_ordered, not_bound_mat_ordered);
 	cout << "Mass Matrix done!!" << endl;
-	m.stiffness_matrix(func, bound_mat_ordered, not_bound_mat_ordered);
+	m.stiffness_matrix(unitary, bound_mat_ordered, not_bound_mat_ordered);
 	cout << "Stiffness Matrix done!!" << endl;
 
 	// Build bound_mat_ordered nad not_bound_mat_ordered.
@@ -58,15 +58,7 @@ void _test_region(){
 	VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
 	w_ij = matrix_solver(not_bound_mat_ordered, b);
 	w = w_stitcher(w_k, w_ij, m);
-	//
-	// for(int i=0; i<m.num_points; i++){
-	// 	cout << w[i] << endl;
-	// 	for(int j=0; j<(m.num_points - m.num_edges); j++){
-	// 		if(m.not_bound[j] == i){
-	// 			cout << "In not_bound" << endl;
-	// 		}
-	// 	}
-	// }
+	print_w(w, m);
 
 	print_status( 1==1, "Region");
 }
