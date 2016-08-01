@@ -8,8 +8,8 @@ double unitary(Vector2d x){
 
 namespace{
 	double func(Vector2d point){
-		return (5.0-point[0]-point[1]);
-		// return 1.0;
+		// return (5.0-point[0]-point[1]);
+		return 1.0;
 	}
 }
 

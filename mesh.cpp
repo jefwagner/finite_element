@@ -856,7 +856,6 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 					col = find_not_bound(tris[t][j]);
 				}
 
-
 				if(on_edge){
 					bound_mat.coeffRef(col, row) += node_element * std::abs(ref_tri.jac());
 				} else if(add_to){

@@ -284,7 +284,13 @@ void print_w(VectorXd w, Mesh &m){
 	w_printed << m.num_points << endl;
 
 	for(int i=0; i<m.num_points; i++){
-		w_printed << i << " " << w[i] << endl;
+		w_printed << m.points[i][0] << " " << m.points[i][1] << " " << w[i] << endl;
+	}
+
+	w_printed << m.num_tris << endl;
+
+	for(int t=0; t<m.num_tris; t++){
+		w_printed << m.tris[t].i << " " << m.tris[t].j << " " << m.tris[t].k << endl;
 	}
 
 	w_printed.close();

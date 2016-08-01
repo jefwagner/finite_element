@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # Find the x and y coordinate for each element in w
 
@@ -7,6 +8,7 @@ def get_data(filename):
     with open(filename, 'r') as f:
         x = []
         y = []
+        z = []
         lines = f.readlines()
         points = lines[0].split()
         num_points = int(points[0])
@@ -14,16 +16,38 @@ def get_data(filename):
             words = line.split()
             x.append(float(words[0]))
             y.append(float(words[1]))
-        return (num_points,x,y)
+            z.append(float(words[2]))
+        return (num_points,x,y,z)
+
+# Find the nodes in each triangle. This relies
+#   on the fact that region_mesh is structured.
+
+def get_tri(filename, num_points):
+    with open(filename, 'r') as f:
+        i = []
+        j = []
+        k = []
+        lines = f.readlines()
+        tris = lines[num_points+1].split()
+        num_tris = int(tris[0])
+        for line in lines[num_points+2:(num_points+2)+(num_tris)]:
+            words = line.split()
+            i.append(float(words[0]))
+            j.append(float(words[1]))
+            k.append(float(words[2]))
+        return (i,j,k)
 
 xy = get_data("w_vector.txt")
-points = [xy[1],xy[2]]
+points = [xy[1],xy[2],xy[3]]
 points = np.asarray(points)
 x = np.asarray(points[0])
 y = np.asarray(points[1])
+z = np.asarray(points[2])
 
-plt.figure()
-# plt.gca().set_aspect('equal')
-plt.plot(x,y)
+tris = get_tri("w_vector.txt", xy[0])
+tris = np.asarray(tris).T
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(x,y,z, triangles=tris)
 plt.show()
-plt.close()
