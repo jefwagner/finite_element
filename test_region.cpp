@@ -3,13 +3,13 @@
 #include "triangle.hpp"
 
 double unitary(Vector2d x){
-	return 1.0;
+	return 0;
 }
 
 namespace{
 	double func(Vector2d point){
 		// return (5.0-point[0]-point[1]);
-		return 1.0;
+		return 0;
 	}
 }
 

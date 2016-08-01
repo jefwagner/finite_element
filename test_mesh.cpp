@@ -19,7 +19,7 @@ namespace{
   }
 
   double func_k(Vector2d point){
-    return 1;
+    return 0;
   }
 }
 
