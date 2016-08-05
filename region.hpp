@@ -25,8 +25,6 @@ VectorXd b_vector_builder(SparseMatrix<double> &, VectorXd);
 VectorXd matrix_solver(SparseMatrix<double> &, VectorXd);
 VectorXd w_stitcher(VectorXd, VectorXd, Mesh &);
 void print_w(VectorXd, Mesh &);
-
-
-
+double energy(double, double, Mesh &, VectorXd);
 
 #endif /* JW_FE_REGION */

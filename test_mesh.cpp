@@ -19,7 +19,11 @@ namespace{
   }
 
   double func_k(Vector2d point){
-    return 0;
+    return 1.0;
+  }
+
+  double func_w(Vector2d point){
+    return point[0] * point[1];
   }
 }
 
@@ -391,7 +395,7 @@ void test_b_vector(){
   mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
 
   VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func_k, mesh_test);
+  w_k = w_k_builder(func_w, mesh_test);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
 }
 
@@ -408,10 +412,33 @@ void test_w_solver(){
   mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
 
   VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func_k, mesh_test);
+  w_k = w_k_builder(func_w, mesh_test);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
   w_ij = matrix_solver(not_bound_mat_unordered, b);
   w = w_stitcher(w_k, w_ij, mesh_test);
 
-  print_status(w[4] == 1, "w_solver");
+  print_status(w[4] == .25, "w_solver");
+}
+
+void test_energy_soln(){
+  triangulateio my_tio;
+
+  my_tio = mesh_constructor_simple();
+
+  Mesh mesh_test(&my_tio);
+
+  SparseMatrix<double> not_bound_mat_unordered(mesh_test.num_points-mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+  SparseMatrix<double> bound_mat_unordered(mesh_test.num_edges, mesh_test.num_points-mesh_test.num_edges);
+
+  mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
+
+  VectorXd w_k, w_ij, w;
+  w_k = w_k_builder(func_w, mesh_test);
+  VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
+  w_ij = matrix_solver(not_bound_mat_unordered, b);
+  w = w_stitcher(w_k, w_ij, mesh_test);
+  energy(1.0, 1.0, mesh_test, w);
+
+  cout << "Energy = " << energy(1.0, 1.0, mesh_test, w) << endl;
+
 }

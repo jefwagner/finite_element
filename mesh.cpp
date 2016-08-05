@@ -693,7 +693,7 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, 
 				on_edge = false;
 				add_to = false;
 				for(int k=0; k<4; k++){
-					node_element += weight[k] * rho(ref_tri(xieta[k])) * v[i][k] * v[j][k];
+					node_element += .5 * weight[k] * rho(ref_tri(xieta[k])) * v[i][k] * v[j][k];
 				}
 
 				for(int e=0; e<num_edges; e++){

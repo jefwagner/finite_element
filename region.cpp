@@ -9,6 +9,7 @@
 
 #include "mesh.hpp"
 #include "triangle.hpp"
+#include "utils.hpp"
 
 #define PI 3.14159265358979323846E+0
 
@@ -294,4 +295,55 @@ void print_w(VectorXd w, Mesh &m){
 	}
 
 	w_printed.close();
+}
+
+double energy(double gamma, double rho, Mesh &m, VectorXd w){
+	int ii,jj,kk;
+	double final_soln = 0.0;
+
+	for(int t=0; t<m.num_tris; t++){
+		ii = m.tris[t].i;
+		jj = m.tris[t].j;
+		kk = m.tris[t].k;
+
+		Vector2d p0 = m.points[ii];
+		Vector2d p1 = m.points[jj];
+		Vector2d p2 = m.points[kk];
+
+		FromRefTri ref_tri(p0, p1, p2);
+		Matrix2d jacob = m.jacobian(p0, p1, p2);
+
+		double element = 0.0;
+
+		// for(int k=0; k<4; k++){
+			double gradient = 0.0;
+
+			for(int i=0; i<3; i++){
+				for(int j=0; j<3; j++){
+					int i_index = m.tris[t][i];
+					int j_index = m.tris[t][j];
+
+					gradient += (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]);
+
+					cout << "Addition Term: " << (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]) << endl;
+				}
+			}
+			// cout << "Gradient: " << gradient << endl;
+			// cout << "Sqare root term: " << gamma * sqrt(1. + gradient) - 1.0 << endl;
+			element += gamma * (sqrt(1. + gradient) - 1.0);// * m.weight[k];
+		// }
+		// cout << "element: " << element << endl << endl;
+		// cout << "Jacobian " << abs(ref_tri.jac()) << endl;
+		final_soln += .5 * element * abs(ref_tri.jac());
+	}
+
+	cout << "Sum of Square Root Term: " << final_soln << endl << endl;
+	double u_sq = 0.0;
+
+	for(int p=0; p<m.num_points; p++){
+		u_sq += w[p] * w[p];
+	}
+	final_soln += rho * .5 * 9.8 * u_sq;
+
+	return final_soln;
 }
