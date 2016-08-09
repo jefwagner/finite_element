@@ -22,8 +22,8 @@ namespace{
     return 1.0;
   }
 
-  double func_w(Vector2d point){
-    return point[0] * point[1];
+  double func_w(Vector2d point, double d){
+    return point[0] + point[1];
   }
 }
 
@@ -395,7 +395,7 @@ void test_b_vector(){
   mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
 
   VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func_w, mesh_test);
+  w_k = w_k_builder(func_w, mesh_test, 2.5);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
 }
 
@@ -412,12 +412,12 @@ void test_w_solver(){
   mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
 
   VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func_w, mesh_test);
+  w_k = w_k_builder(func_w, mesh_test, 2.5);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
   w_ij = matrix_solver(not_bound_mat_unordered, b);
   w = w_stitcher(w_k, w_ij, mesh_test);
 
-  print_status(w[4] == .25, "w_solver");
+  print_status(w[4] == 1.0, "w_solver");
 }
 
 void test_energy_soln(){
@@ -433,12 +433,13 @@ void test_energy_soln(){
   mesh_test.stiffness_matrix(func_k, bound_mat_unordered, not_bound_mat_unordered);
 
   VectorXd w_k, w_ij, w;
-  w_k = w_k_builder(func_w, mesh_test);
+  w_k = w_k_builder(func_w, mesh_test, 2.5);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
   w_ij = matrix_solver(not_bound_mat_unordered, b);
   w = w_stitcher(w_k, w_ij, mesh_test);
-  energy(1.0, 1.0, mesh_test, w);
+  double soln = energy(1.0, 1.0, mesh_test, w);
 
-  cout << "Energy = " << energy(1.0, 1.0, mesh_test, w) << endl;
+  cout << soln << endl;
 
+  print_status(soln == (sqrt(3) - 1.0), "Energy Solution");
 }

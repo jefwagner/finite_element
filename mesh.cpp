@@ -747,10 +747,10 @@ Matrix2d Mesh::jacobian(Vector2d p0, Vector2d p1, Vector2d p2){
 
 	Matrix2d jacobian;
 
-	jacobian(0,1) = grad_d/grad_const;
-	jacobian(1,1) = -grad_b/grad_const;
-	jacobian(0,0) = -grad_c/grad_const;
-	jacobian(1,0) = grad_a/grad_const;
+	jacobian(0,0) = grad_d/grad_const;
+	jacobian(1,0) = -grad_b/grad_const;
+	jacobian(0,1) = -grad_c/grad_const;
+	jacobian(1,1) = grad_a/grad_const;
 
 	return jacobian;
 }

@@ -55,3 +55,25 @@ plt.gca().set_aspect('equal')
 plt.triplot(x,y,tris)
 plt.show()
 plt.close()
+
+# Main file, first obtaining the number of points,
+#   then collecting all the points into two
+#   seperate arrays x and y. Finally, it puts
+#   all of the listed triangles in an array.
+
+xy = get_xy("region_mesh_f.txt")
+points = [xy[1],xy[2]]
+points = np.asarray(points)
+x = np.asarray(points[0])
+y = np.asarray(points[1])
+tris = get_tri("region_mesh_f.txt", xy[0])
+tris = np.asarray(tris).T
+
+# With the a list of x,y, and triangles, matplotlib
+#   allows easy plotting of the mesh.
+
+plt.figure()
+plt.gca().set_aspect('equal')
+plt.triplot(x,y,tris)
+plt.show()
+plt.close()

@@ -51,3 +51,33 @@ fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.plot_trisurf(x,y,z, triangles=tris)
 plt.show()
+
+xy = get_data("w_vector_init.txt")
+points = [xy[1],xy[2],xy[3]]
+points = np.asarray(points)
+x = np.asarray(points[0])
+y = np.asarray(points[1])
+z = np.asarray(points[2])
+
+tris = get_tri("w_vector_init.txt", xy[0])
+tris = np.asarray(tris).T
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(x,y,z, triangles=tris)
+plt.show()
+
+xy = get_data("w_vector_f.txt")
+points = [xy[1],xy[2],xy[3]]
+points = np.asarray(points)
+x = np.asarray(points[0])
+y = np.asarray(points[1])
+z = np.asarray(points[2])
+
+tris = get_tri("w_vector_f.txt", xy[0])
+tris = np.asarray(tris).T
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(x,y,z, triangles=tris)
+plt.show()

@@ -36,11 +36,15 @@ namespace{
 		ret = point[0] * point[1];
 		return ret;
 	}
+
+	double u_sq(Vector2d u_u){
+		return u_u[0] * u_u[1];
+	}
 }
 
 
 int num_circ(double r){
-	double dx = 0.01;
+	double dx = 0.1;
 	return static_cast<int>(2*PI*r/dx);
 }
 
@@ -231,12 +235,12 @@ void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatri
 	ordered_not_bound_mat.close();
 }
 
-VectorXd w_k_builder(double(*func)(Vector2d), Mesh &m){
+VectorXd w_k_builder(double(*func)(Vector2d, double), Mesh &m, double d){
 	VectorXd ret(m.num_edges);
 	for(int i=0; i<m.num_edges; i++){
 		int index = m.bound[i];
 		Vector2d point = m.points[index];
-		ret[i] = func(point);
+		ret[i] = func(point, d);
 	}
 	return ret;
 }
@@ -275,11 +279,9 @@ VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
 	return ret;
 }
 
-void print_w(VectorXd w, Mesh &m){
-	ofstream w_printed;
-	w_printed.open("w_vector.txt");
+void print_w(VectorXd w, Mesh &m, fstream &w_printed){
 	if(w_printed.is_open() == false){
-		cout << "Unable to open w_vector" << endl;
+		cout << "Unable to open " << w_printed << endl;
 	}
 
 	w_printed << m.num_points << endl;
@@ -297,7 +299,7 @@ void print_w(VectorXd w, Mesh &m){
 	w_printed.close();
 }
 
-double energy(double gamma, double rho, Mesh &m, VectorXd w){
+double energy(Mesh_Struct &ms, Mesh &m, VectorXd w){
 	int ii,jj,kk;
 	double final_soln = 0.0;
 
@@ -313,37 +315,42 @@ double energy(double gamma, double rho, Mesh &m, VectorXd w){
 		FromRefTri ref_tri(p0, p1, p2);
 		Matrix2d jacob = m.jacobian(p0, p1, p2);
 
+		// gradient of u term
+
 		double element = 0.0;
 
-		// for(int k=0; k<4; k++){
-			double gradient = 0.0;
+		double gradient = 0.0;
+
+		for(int i=0; i<3; i++){
+			for(int j=0; j<3; j++){
+				int i_index = m.tris[t][i];
+				int j_index = m.tris[t][j];
+
+				gradient += (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]);
+
+			}
+		}
+		element += ms.surface_tension * (sqrt(1. + gradient) - 1.0);
+		final_soln += .5 * element * std::abs(ref_tri.jac());
+
+		// u sqared term
+		element = 0.0;
+		for(int k=0; k<4; k++){
+			double u_sq = 0;
 
 			for(int i=0; i<3; i++){
 				for(int j=0; j<3; j++){
 					int i_index = m.tris[t][i];
 					int j_index = m.tris[t][j];
 
-					gradient += (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]);
-
-					cout << "Addition Term: " << (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]) << endl;
+					u_sq += m.v[i][k] * m.v[j][k] * w[i_index] * w[j_index];
 				}
 			}
-			// cout << "Gradient: " << gradient << endl;
-			// cout << "Sqare root term: " << gamma * sqrt(1. + gradient) - 1.0 << endl;
-			element += gamma * (sqrt(1. + gradient) - 1.0);// * m.weight[k];
-		// }
-		// cout << "element: " << element << endl << endl;
-		// cout << "Jacobian " << abs(ref_tri.jac()) << endl;
-		final_soln += .5 * element * abs(ref_tri.jac());
-	}
+			element += ms.rho * ms.g * .5 * u_sq * m.weight[k];
+		}
 
-	cout << "Sum of Square Root Term: " << final_soln << endl << endl;
-	double u_sq = 0.0;
-
-	for(int p=0; p<m.num_points; p++){
-		u_sq += w[p] * w[p];
+		final_soln += .5 * element * std::abs(ref_tri.jac());
 	}
-	final_soln += rho * .5 * 9.8 * u_sq;
 
 	return final_soln;
 }
