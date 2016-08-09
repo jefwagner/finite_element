@@ -11,28 +11,33 @@ class Mesh_Struct{
 public:
   double length_unit;
   double acceleration_unit;
-  double surface_tension;
+  double energy_density_unit;
+
+  double d;
+  double dd;
+  double new_d;
+
   double energy_unit;
   double time_unit;
   double mass_unit;
   double force_unit;
-  double d;
-  double dd;
-  double new_d;
-  double density;
+  double rho;
 
-  Mesh_Struct(double r, double gamma, double g, double dist, double change_dist){
-    length_unit = r;
-    acceleration_unit = g;
-    surface_tension = gamma;
-    energy_unit = gamma * r * r;
-    time_unit = sqrt(r / g);
-    mass_unit = g * gamma * r;
-    force_unit = gamma * r;
-    d = dist/r;
+  Mesh_Struct(double r, double gamma, double density, double dist, double change_dist){
+    length_unit = r * .000001;                // In terms of micrometers
+    acceleration_unit = 9.8;
+    energy_density_unit = gamma * .0728;      // In terms of percent surface tension of water (N/m)
+
+    d = dist;
     dd = change_dist;
     new_d = d + dd;
-    density = mass_unit / length_unit;
+
+    energy_unit = energy_density_unit * length_unit * length_unit;
+    time_unit = sqrt(r / acceleration_unit);
+    mass_unit = acceleration_unit * energy_density_unit * length_unit;
+    force_unit = energy_density_unit * length_unit;
+
+    rho = density * mass_unit / (length_unit * length_unit * length_unit);    // In terms of density of water
   }
 };
 
@@ -54,6 +59,6 @@ VectorXd b_vector_builder(SparseMatrix<double> &, VectorXd);
 VectorXd matrix_solver(SparseMatrix<double> &, VectorXd);
 VectorXd w_stitcher(VectorXd, VectorXd, Mesh &);
 void print_w(VectorXd, Mesh &, fstream &w_printed);
-double energy(double, double, Mesh &, VectorXd);
+double energy(Mesh &, VectorXd, double, double);
 
 #endif /* JW_FE_REGION */

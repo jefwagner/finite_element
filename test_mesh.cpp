@@ -437,9 +437,9 @@ void test_energy_soln(){
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
   w_ij = matrix_solver(not_bound_mat_unordered, b);
   w = w_stitcher(w_k, w_ij, mesh_test);
-  double soln = energy(1.0, 1.0, mesh_test, w);
+  double soln = energy(mesh_test, w, 1.0, 1.0);
 
   cout << soln << endl;
 
-  print_status(soln == (sqrt(3) - 1.0), "Energy Solution");
+  print_status(soln == 1.31538, "Energy Solution");
 }

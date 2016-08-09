@@ -23,12 +23,18 @@ void test_region(){
 	tio *out;
 	tio *vor;
 
-	Mesh_Struct gen_test(1., 1., 1., 4., 1.);
+	double r = 5.;
+	double gamma = 1.;
+	double d = 4.;
+	double dd = .01;
+	double rho = 0.5;
 
-	int num_points = 56 + num_circ(gen_test.length_unit) + num_circ(gen_test.length_unit);
+	Mesh_Struct force(r, gamma, rho, d, dd);
+
+	int num_points = 56 + num_circ(r) + num_circ(r);
 
 	in = malloc_pslg(num_points);
-	fill_pslg(in, gen_test.d, gen_test.length_unit, gen_test.length_unit);
+	fill_pslg(in, d, r, r);
 	out = malloc_tio();
 	vor = (tio *) NULL;
 	char *triswitches = "pq30a0.1z";
@@ -57,7 +63,7 @@ void test_region(){
 	// Solving for w.
 
 	VectorXd w_k, w_ij, w;
-	w_k = w_k_builder(func, m, gen_test.d);
+	w_k = w_k_builder(func, m, d);
 	VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
 	w_ij = matrix_solver(not_bound_mat_ordered, b);
 	w = w_stitcher(w_k, w_ij, m);
@@ -68,17 +74,23 @@ void test_region(){
 	print_status( 1==1, "Region");
 }
 
-void test_force(){
+void test_energy(){
 	tio *in;
 	tio *out;
 	tio *vor;
 
-	Mesh_Struct force(1., 1., 1., 4., 1.);
+	double r = 5.;
+	double gamma = 1.;
+	double d = 4.;
+	double dd = .01;
+	double rho = 0.5;
 
-	int num_points = 56 + num_circ(gen_test.length_unit) + num_circ(gen_test.length_unit);
+	Mesh_Struct force(r, gamma, rho, d, dd);
+
+	int num_points = 56 + num_circ(r) + num_circ(r);
 
 	in = malloc_pslg(num_points);
-	fill_pslg(in, gen_test.d, gen_test.length_unit, gen_test.length_unit);
+	fill_pslg(in, d, r, r);
 	out = malloc_tio();
 	vor = (tio *) NULL;
 	char *triswitches = "pq30a0.1z";
@@ -96,12 +108,64 @@ void test_force(){
 	m.stiffness_matrix(unitary, bound_mat_ordered, not_bound_mat_ordered);
 
 	VectorXd w_k, w_ij, w;
-	w_k = w_k_builder(func, m, gen_test.d);
+	w_k = w_k_builder(func, m, r);
 	VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
 	w_ij = matrix_solver(not_bound_mat_ordered, b);
 	w = w_stitcher(w_k, w_ij, m);
 
-	
+	energy(m, w, gamma, rho);
 
-	print_status( 1==1, "Force");
+	print_status( 1==1, "energy");
+}
+
+void test_force(){
+	tio *in;
+	tio *out;
+	tio *vor;
+
+	double r = 5.;
+	double gamma = 1.;
+	double rho = 0.5;
+	double d = 2.2;
+	double dd = .1;
+
+	fstream energy_f("Energy_plot.txt", fstream::out);
+
+	while(d<=5.0){
+		Mesh_Struct force(r, gamma, rho, d, dd);
+
+		int num_points = 56 + num_circ(r) + num_circ(r);
+
+		in = malloc_pslg(num_points);
+		fill_pslg(in, d, r, r);
+		out = malloc_tio();
+		vor = (tio *) NULL;
+		char *triswitches = "pq30a0.1z";
+		triangulate(triswitches, in, out, vor);
+		Mesh m(out);
+
+		int center = 12;
+
+		SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
+		SparseMatrix<double> bound_mat_ordered(m.num_edges, m.num_points-m.num_edges);
+
+		m.reorder_nodes(center);
+
+		m.mass_matrix(unitary, bound_mat_ordered, not_bound_mat_ordered);
+		m.stiffness_matrix(unitary, bound_mat_ordered, not_bound_mat_ordered);
+
+		VectorXd w_k, w_ij, w;
+		w_k = w_k_builder(func, m, r);
+		VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
+		w_ij = matrix_solver(not_bound_mat_ordered, b);
+		w = w_stitcher(w_k, w_ij, m);
+
+		double energy_soln = energy(m, w, gamma, rho);
+
+		energy_f << d << " " << energy_soln << endl;
+
+		d += dd;
+	}
+
+	energy_f.close();
 }

@@ -36,10 +36,6 @@ namespace{
 		ret = point[0] * point[1];
 		return ret;
 	}
-
-	double u_sq(Vector2d u_u){
-		return u_u[0] * u_u[1];
-	}
 }
 
 
@@ -275,7 +271,6 @@ VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
 			cout << "Error in w_switcher at point p: " << b << endl;
 		}
 	}
-
 	return ret;
 }
 
@@ -299,7 +294,7 @@ void print_w(VectorXd w, Mesh &m, fstream &w_printed){
 	w_printed.close();
 }
 
-double energy(Mesh_Struct &ms, Mesh &m, VectorXd w){
+double energy(Mesh &m, VectorXd w, double gamma, double rho){
 	int ii,jj,kk;
 	double final_soln = 0.0;
 
@@ -320,6 +315,7 @@ double energy(Mesh_Struct &ms, Mesh &m, VectorXd w){
 		double element = 0.0;
 
 		double gradient = 0.0;
+		double u_sq = 0.0;
 
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
@@ -328,28 +324,32 @@ double energy(Mesh_Struct &ms, Mesh &m, VectorXd w){
 
 				gradient += (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]);
 
-			}
-		}
-		element += ms.surface_tension * (sqrt(1. + gradient) - 1.0);
-		final_soln += .5 * element * std::abs(ref_tri.jac());
-
-		// u sqared term
-		element = 0.0;
-		for(int k=0; k<4; k++){
-			double u_sq = 0;
-
-			for(int i=0; i<3; i++){
-				for(int j=0; j<3; j++){
-					int i_index = m.tris[t][i];
-					int j_index = m.tris[t][j];
-
-					u_sq += m.v[i][k] * m.v[j][k] * w[i_index] * w[j_index];
+				for(int k=0; k<4; k++){
+					u_sq += m.v[i][k] * m.v[j][k] * w[i_index] * w[j_index] * m.weight[k];
 				}
-			}
-			element += ms.rho * ms.g * .5 * u_sq * m.weight[k];
-		}
 
+			}
+		}
+		element += gamma * (sqrt(1. + gradient) - 1.0) + (rho * .5 * u_sq);
 		final_soln += .5 * element * std::abs(ref_tri.jac());
+
+		// // u sqared term
+		// element = 0.0;
+		// for(int k=0; k<4; k++){
+		// 	double u_sq = 0;
+		//
+		// 	for(int i=0; i<3; i++){
+		// 		for(int j=0; j<3; j++){
+		// 			int i_index = m.tris[t][i];
+		// 			int j_index = m.tris[t][j];
+		//
+		// 			u_sq += m.v[i][k] * m.v[j][k] * w[i_index] * w[j_index];
+		// 		}
+		// 	}
+		// 	element += rho * .5 * u_sq * m.weight[k];
+		// }
+		//
+		// final_soln += .5 * element * std::abs(ref_tri.jac());
 	}
 
 	return final_soln;

@@ -796,10 +796,12 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 				break;
 			}
 		}
+		bool set = false;
 		if(!on_edge){
 			for(int i=0; i<num_points - num_edges; i++){
 				if(not_bound[i] == -1){
 					not_bound[i] = p;
+					set = true;
 					break;
 				}
 			}
@@ -807,9 +809,13 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 			for(int i=0; i<num_edges; i++){
 				if(bound[i] == -1){
 					bound[i] = p;
+					set = true;
 					break;
 				}
 			}
+		}
+		if(set){
+			cout << "OBOE at point: " << p;
 		}
 	}
 
