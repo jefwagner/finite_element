@@ -3,6 +3,7 @@
 #include "triangle.hpp"
 #include <sstream>
 #include <string>
+#include <iomanip>
 
 double unitary(Vector2d x){
 	return 1.0;
@@ -126,7 +127,7 @@ void test_force(){
 	double r = 5.;
 	double gamma = 1.;
 	double rho = 0.;
-	double d = 2.0;
+	double d = 2.1;
 	double dd = .01;
 
 	fstream energy_f("Energy_plot.txt", fstream::out);
@@ -159,8 +160,10 @@ void test_force(){
 		VectorXd b = b_vector_builder(bound_mat_ordered, w_k);
 		w_ij = matrix_solver(not_bound_mat_ordered, b);
 		w = w_stitcher(w_k, w_ij, m);
+
+		string dir = argv[0];
 		stringstream strs;
-		strs << "w_vector_d_" << d << ".txt";
+		strs << std::setprecision(3) << dir + "/data/w_vector_d_" << d << "_rho_" << rho << "_gamma_" << gamma << ".txt";
 		string str = strs.str();
 		cout << str << endl;
 		fstream f_w(str.c_str(), fstream::out);

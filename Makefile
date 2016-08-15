@@ -63,7 +63,7 @@ LIBS += -lm
 # Build the program.
 # This is the default behavior if no targets are declared
 $(PROGRAM): $(OBJS)
-	$(CXX) $(LDFLAGS) $(LIBS) $^ -o $@
+	$(CXX) $(LDFLAGS) $^ $(LIBS) -o $@
 
 # Include the dependencies
 # This has all of the additional dependencies
