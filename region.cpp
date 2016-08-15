@@ -131,7 +131,7 @@ void fill_pslg(tio *in, double d, double r1, double r2){
 
 	for(i=0; i<56; i++){
 		double theta = 2*PI*i/56;
-		add_point(pl, &n, 1.5*d*cos(theta), d*sin(theta));
+		add_point(pl, &n, 10.*cos(theta), 5.*sin(theta));
 	}
 	// Four corners of surrounding box
 

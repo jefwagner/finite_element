@@ -814,8 +814,8 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 				}
 			}
 		}
-		if(set){
-			cout << "OBOE at point: " << p;
+		if(!set){
+			cout << "OBOE at point: " << p << endl;
 		}
 	}
 

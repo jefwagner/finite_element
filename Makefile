@@ -22,10 +22,10 @@ CXX = g++
 PY = python
 
 # Choose the compiler flags to set
-CFlAGS = -Wall
+CFlAGS = -Wall -g
 CFLAGS += -O0 -ggdb
 
-CXXFLAGS = -Wall
+CXXFLAGS = -Wall -g
 CXXFLAGS += -O0 -ggdb
 
 # Set the inclusion and library path
