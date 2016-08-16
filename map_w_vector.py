@@ -37,14 +37,14 @@ def get_tri(filename, num_points):
             k.append(float(words[2]))
         return (i,j,k)
 
-xy = get_data("w_vector.txt")
+xy = get_data("data/w_vector_d_2.100_rho_0.000_gamma_1.000.dat")
 points = [xy[1],xy[2],xy[3]]
 points = np.asarray(points)
 x = np.asarray(points[0])
 y = np.asarray(points[1])
 z = np.asarray(points[2])
 
-tris = get_tri("w_vector.txt", xy[0])
+tris = get_tri("data/w_vector_d_2.100_rho_0.000_gamma_1.000.dat", xy[0])
 tris = np.asarray(tris).T
 
 fig = plt.figure()
@@ -52,14 +52,14 @@ ax = fig.gca(projection='3d')
 ax.plot_trisurf(x,y,z, triangles=tris)
 plt.show()
 
-xy = get_data("w_vector_init.txt")
+xy = get_data("data/w_vector_d_10.000_rho_0.000_gamma_1.000.dat")
 points = [xy[1],xy[2],xy[3]]
 points = np.asarray(points)
 x = np.asarray(points[0])
 y = np.asarray(points[1])
 z = np.asarray(points[2])
 
-tris = get_tri("w_vector_init.txt", xy[0])
+tris = get_tri("data/w_vector_d_10.000_rho_0.000_gamma_1.000.dat", xy[0])
 tris = np.asarray(tris).T
 
 fig = plt.figure()
@@ -67,14 +67,14 @@ ax = fig.gca(projection='3d')
 ax.plot_trisurf(x,y,z, triangles=tris)
 plt.show()
 
-xy = get_data("w_vector_f.txt")
+xy = get_data("data/w_vector_d_5.510_rho_0.000_gamma_1.000.dat")
 points = [xy[1],xy[2],xy[3]]
 points = np.asarray(points)
 x = np.asarray(points[0])
 y = np.asarray(points[1])
 z = np.asarray(points[2])
 
-tris = get_tri("w_vector_f.txt", xy[0])
+tris = get_tri("data/w_vector_d_5.510_rho_0.000_gamma_1.000.dat", xy[0])
 tris = np.asarray(tris).T
 
 fig = plt.figure()
