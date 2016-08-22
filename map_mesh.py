@@ -53,6 +53,9 @@ tris = np.asarray(tris).T
 plt.figure()
 plt.gca().set_aspect('equal')
 plt.triplot(x,y,tris)
+plt.title("Top Down View of Surface")
+plt.xlabel("(Radius)")
+plt.ylabel("(Radius)")
 plt.show()
 plt.close()
 

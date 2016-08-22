@@ -12,9 +12,9 @@ double unitary(Vector2d x){
 namespace{
 	double func(Vector2d point, double d){
 		if(nearbyint(sqrt(((point[0] + d/2.) * (point[0] + d/2.)) + (point[1] * point[1]))) == 1){
-			return -0.1;
+			return 0.1;
 		} else if(nearbyint(sqrt(((point[0] - d/2.) * (point[0] - d/2.)) + (point[1] * point[1]))) == 1){
-			return -0.1;
+			return 0.1;
 		}
 		return 0.0;
 	}
@@ -29,7 +29,7 @@ int main(){
 	double r = 5.;
 	double gamma = 1.;
 	double rho = 0.;
-	double d = 2.1;
+	double d = 2.5;
 	double dd = .01;
 
 	fstream energy_f("Energy_plot.txt", fstream::out);

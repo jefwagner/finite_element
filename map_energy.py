@@ -19,4 +19,7 @@ d = np.asarray(data[0])
 energy = np.asarray(data[1])
 
 plt.plot(d,energy)
+plt.title("Energy Plot")
+plt.xlabel("Distance (Radius)")
+plt.ylabel("Energy (Surface Tension * Radius^2)")
 plt.show()
