@@ -24,9 +24,11 @@ PY = python
 # Choose the compiler flags to set
 CFlAGS = -Wall -g
 CFLAGS += -O0 -ggdb
+CFLAGS += -fopenmp
 
 CXXFLAGS = -Wall -g
 CXXFLAGS += -O0 -ggdb
+CXXFLAGS += -fopenmp
 
 # Set the inclusion and library path
 
@@ -53,7 +55,7 @@ endif
 # Set the libraries to link to
 LIBS = -ltriangle
 LIBS += -lm
-
+LIBS += -fopenmp
 
 # Declare the test and clean as phoney
 # This lets Make know that there should

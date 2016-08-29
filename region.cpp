@@ -19,31 +19,32 @@ typedef struct triangulateio tio;
 
 namespace{
 
+	// Used To add points along the border to the initial surface
 	void add_point(double *pl, int *n, double x, double y){
 		pl[2*(*n)+0] = x;
 		pl[2*(*n)+1] = y;
 		(*n)++;
 	}
 
+	// Standard Free alloted arrays to be used in the Destructor
 	void free_if_not_null( void *ptr){
 		if( ptr != NULL){
 			free(ptr);
 		}
 	}
-
-	double func(Vector2d point){
-		double ret;
-		ret = point[0] * point[1];
-		return ret;
-	}
 }
 
-
+//-----------------------------------------------
+// Used to find the number of points that will
+// 	surround one particle
 int num_circ(double r){
 	double dx = 0.1;
 	return static_cast<int>(2*PI*r/dx);
 }
 
+//-----------------------------------------------
+// Creates the necessary preliminary data types
+// 	for our surface to be put into Triangle
 tio * malloc_tio(){
 	tio* in = (tio *) malloc(sizeof(tio));
 
@@ -73,6 +74,9 @@ tio * malloc_tio(){
 	return in;
 }
 
+//-----------------------------------------------
+// Putting our Surface into a form that Triangle
+// 	can then read and create the mesh
 tio * malloc_pslg(int num_points){
 	// Allocate the triangulateio object to hold the
 	// planar straight line graph
@@ -91,6 +95,8 @@ tio * malloc_pslg(int num_points){
 	return in;
 }
 
+//-----------------------------------------------
+// Destructor for memory allocated from Mesh
 void free_tio(tio *in){
 	free_if_not_null( (void *) in->pointlist);
 	free_if_not_null( (void *) in->pointattributelist);
@@ -108,6 +114,9 @@ void free_tio(tio *in){
 	free_if_not_null( (void *) in->normlist);
 }
 
+//-----------------------------------------------
+// Creation of surface that will be put into
+// 	Triangle to be turned into a Mesh
 void fill_pslg(tio *in, double d, double r1, double r2){
 	int n = 0;
 	int first, i;
@@ -129,6 +138,7 @@ void fill_pslg(tio *in, double d, double r1, double r2){
 	// 	-The shape comes from the last
 	// 		2 parameters in add_point()
 
+	// Border set to be an elipse the size of 5 radii by 10 radii
 	for(i=0; i<56; i++){
 		double theta = 2*PI*i/56;
 		add_point(pl, &n, 10.*cos(theta), 5.*sin(theta));
@@ -180,15 +190,21 @@ void fill_pslg(tio *in, double d, double r1, double r2){
 	in->holelist[2*1+1] = 0.;
 }
 
+//-----------------------------------------------
+// Printing the mesh to a text file so that it
+// 	can be plotted using easier software that
+// 	make it look prettier
 void print_mesh( fstream &f, Mesh &m){
 	int i;
 
+	// Printing Number of Points and point list
 	f << "Points " << m.num_points << endl;
 	for( i=0; i<m.num_points; i++){
 		f << m.points[i][0] << " " << m.points[i][1] << endl;
 	}
 	f << endl;
 
+	// Printing Number of Triangles and Triangle list
 	f << "Triangles " << m.num_tris << endl;
 	for( i=0; i<m.num_tris; i++){
 		f << m.tris[i][0] << " " << m.tris[i][1] << " " << m.tris[i][2] << endl;
@@ -196,9 +212,9 @@ void print_mesh( fstream &f, Mesh &m){
 	f << endl;
 }
 
+//-----------------------------------------------
+// Print the SparseMatrix for bound and not bound
 void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatrix<double> &bound_mat_ordered){
-
-	// Ordered Mass Matrix
 
 	// Nodes on the boundary
 
@@ -207,12 +223,12 @@ void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatri
   if(ordered_bound_mat.is_open() == false){
     cout << "Unable to open ordered_bound_mat" << endl << std::flush;
   }
-    ordered_bound_mat << m.num_points<< "\n";
-		for(int i=0; i<bound_mat_ordered.outerSize(); i++){
-			for(SparseMatrix<double>::InnerIterator it(bound_mat_ordered, i); it; ++it){
-				ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
-			}
+  ordered_bound_mat << m.num_edges<< "\n";
+	for(int i=0; i<bound_mat_ordered.outerSize(); i++){
+		for(SparseMatrix<double>::InnerIterator it(bound_mat_ordered, i); it; ++it){
+			ordered_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
 		}
+	}
   ordered_bound_mat.close();
 
 	// Nodes not on the boundary
@@ -222,15 +238,18 @@ void print_mat(Mesh &m, SparseMatrix<double> &not_bound_mat_ordered, SparseMatri
 	if(ordered_not_bound_mat.is_open() == false){
 		cout << "Unable to open ordered_not_bound_mat" << endl << std::flush;
 	}
-		ordered_not_bound_mat << m.num_points<< "\n";
-		for(int i=0; i<not_bound_mat_ordered.outerSize(); i++){
-			for(SparseMatrix<double>::InnerIterator it(not_bound_mat_ordered, i); it; ++it){
-				ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
-			}
+	ordered_not_bound_mat << m.num_points - m.num_edges << "\n";
+	for(int i=0; i<not_bound_mat_ordered.outerSize(); i++){
+		for(SparseMatrix<double>::InnerIterator it(not_bound_mat_ordered, i); it; ++it){
+			ordered_not_bound_mat << it.col() << " " << it.row() << " " << it.value() << endl;
 		}
+	}
 	ordered_not_bound_mat.close();
 }
 
+//-----------------------------------------------
+// Builder for w_k matrix. The Boundary
+// 	condition is introduced here
 VectorXd w_k_builder(double(*func)(Vector2d, double), Mesh &m, double d){
 	VectorXd ret(m.num_edges);
 	for(int i=0; i<m.num_edges; i++){
@@ -241,19 +260,29 @@ VectorXd w_k_builder(double(*func)(Vector2d, double), Mesh &m, double d){
 	return ret;
 }
 
+//-----------------------------------------------
+// The Right side of the equation builder for the
+// 	final solution in the Linear Algebra solver
 VectorXd b_vector_builder(SparseMatrix<double> &a_ik, VectorXd w_k){
 	return -1. * a_ik.transpose() * w_k;
 }
 
+//-----------------------------------------------
+// The actual call to the solver to find w
 VectorXd matrix_solver(SparseMatrix<double> &a_ij, VectorXd b){
 	VectorXd ret;
 
+	// Simplicial LLT was the solver we chose for
+	// 	for speed and accuracy and ease.
 	SimplicialLLT<SparseMatrix<double> > solver;
 	solver.compute(a_ij);
 	ret = solver.solve(b);
 	return ret;
 }
 
+//-----------------------------------------------
+// Stitches w_k and w_ij back together to create
+// 	w which is final solution to PDE for the mesh
 VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
 	int i=0;
 	int j=0;
@@ -274,6 +303,8 @@ VectorXd w_stitcher(VectorXd w_ik, VectorXd w_ij, Mesh &m){
 	return ret;
 }
 
+//-----------------------------------------------
+// Print w out so that can be plotted else where
 void print_w(VectorXd w, Mesh &m, fstream &w_printed){
 	if(w_printed.is_open() == false){
 		cout << "Unable to open " << w_printed << endl;
@@ -294,6 +325,12 @@ void print_w(VectorXd w, Mesh &m, fstream &w_printed){
 	w_printed.close();
 }
 
+//-----------------------------------------------
+// Solve for the energy of the mesh.
+// 	There are two ways this is done for the u
+// 	squared term, The commented out part is
+// 	a slower solution but in theory are
+// 	identical, I think.
 double energy(Mesh &m, VectorXd w, double gamma, double rho){
 	int ii,jj,kk;
 	double final_soln = 0.0;
@@ -318,12 +355,15 @@ double energy(Mesh &m, VectorXd w, double gamma, double rho){
 		double u_sq = 0.0;
 
 		for(int i=0; i<3; i++){
+			int i_index = m.tris[t][i];
+
 			for(int j=0; j<3; j++){
-				int i_index = m.tris[t][i];
 				int j_index = m.tris[t][j];
 
+				// The Square Gradient of u term
 				gradient += (m.grad_v[i].transpose() * jacob).dot(jacob.transpose() * m.grad_v[j]) * (w[i_index] * w[j_index]);
 
+				// The u squared term
 				for(int k=0; k<4; k++){
 					u_sq += m.v[i][k] * m.v[j][k] * w[i_index] * w[j_index] * m.weight[k];
 				}

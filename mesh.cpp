@@ -27,6 +27,7 @@ double Mesh::weight[4] = {-27./48., 25./48., 25./48.,	25./48.};
 double Mesh::v[3][4] = {{1./3., 3./5., 1./5., 1./5.},
 												{1./3., 1./5., 1./5., 3./5.},
 												{1./3., 1./5., 3./5., 1./5.}};
+
 Vector2d Mesh::grad_v[3] = {
 	Vector2d(-1, -1),
 	Vector2d(0, 1),
@@ -573,7 +574,6 @@ double Mesh::integrate(double(*func)(Vector2d)){
 // find_not_bound -> find the index of a node in
 //	not_bound if it is an element of not_bound,
 //	else return -1.
-
 int Mesh::find_not_bound(int n){
 	int b;
 
@@ -594,7 +594,6 @@ int Mesh::find_not_bound(int n){
 // find_bound -> find the index of a node in
 //	bound if it is an element of bound,
 //	else return -1.
-
 int Mesh::find_bound(int n){
 	int b;
 
@@ -724,7 +723,6 @@ void Mesh::mass_matrix(double(*rho)(Vector2d), SparseMatrix<double> &bound_mat, 
 //###############################################
 // The next function was created as a supporting
 //	funciton for stiffness_matrix.
-
 //-----------------------------------------------
 // jacobian -> creates a 2 by 2 jacobian matrix
 //	based on 3 points in x-y space, not Xi-Eta
@@ -784,6 +782,7 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 	for(int i=0; i<num_points-num_edges; i++){
 		not_bound[i] = -1;
 	}
+
 	for(int i=0; i<num_edges; i++){
 		bound[i] = -1;
 	}
@@ -846,7 +845,6 @@ void Mesh::stiffness_matrix(double(*stiff)(Vector2d), SparseMatrix<double> &boun
 				double gradient = (grad_v[j].transpose() * jacob) * (jacob.transpose() * grad_v[i]);
 
 				for(int k=0; k<4; k++){
-
 					node_element += .5 * weight[k] * stiff(ref_tri(xieta[k])) * gradient;
 				}
 

@@ -27,6 +27,10 @@ namespace{
   }
 }
 
+//-----------------------------------------------
+// Creates t e s t mesh of a 5 by 6 mesh of nodes
+//  and cooresponding triangles to test the
+//  various mesh functions.
 void test_constructor(){
 
   // The Goal is to fake a triangulateio output
@@ -110,6 +114,12 @@ void test_constructor(){
 
 }
 
+//-----------------------------------------------
+// T e s ting reorder with the 5 by 6 mesh created
+//  above with two nodes. First by checking if
+//  node 25 is farthest from node 12 and then
+//  if node 4 on the original mesh is farthest
+//  from node 17 on the original mesh.
 void test_reorder(){
 
   // Call the constructor to construct the t e s t mesh.
@@ -169,6 +179,9 @@ void test_reorder(){
   print_status( count==4, "reorder_nodes");
 }
 
+//-----------------------------------------------
+// T e s ting intigrate by checking to see if
+//  it works with a known analytical solution
 void test_integrate(){
   triangulateio my_tio;
 
@@ -185,6 +198,12 @@ void test_integrate(){
   print_status(integral == 100, "Integrate");
 }
 
+//-----------------------------------------------
+// T e s ting to see if the mass matrix can be
+//  created, There is currently no way that I
+//  can think of to check to see if it is the
+//  solution is correct or not. Luckily its
+//  calculation is fairly simple.
 void test_massMatrix(){
   triangulateio my_tio;
 
@@ -272,6 +291,15 @@ void test_massMatrix(){
   print_status(1 == 1, "massMatrix");
 }
 
+//-----------------------------------------------
+// This t e s ts the creation of the stiffness
+//  matrix. Unlike the mass matrix, this can
+//  be checked when calculating the energy of
+//  the system. This is done by multiplying the
+//  mass matrix by zero and checking the ratio
+//  of nodes on the boundary and nodes not on the
+//  the boundary in the simple t e s t mesh. See
+//  notebook stiffness matrix sectionfor details.
 void test_stiffnessMatrix(){
   triangulateio my_tio;
 
@@ -357,6 +385,11 @@ void test_stiffnessMatrix(){
   print_status(1 ==1, "stiffnessMatrix");
 }
 
+//-----------------------------------------------
+// T e s t of k matrix and stiffness matrix
+//  by multiplying the mass matrix by zero and
+//  checking for that special ratio in the simple
+//  t e s t mesh.
 void test_k_matrix(){
   double testk;
   int testcount = 0;
@@ -382,6 +415,9 @@ void test_k_matrix(){
   print_status(testcount == 4, "k_matrix");
 }
 
+//-----------------------------------------------
+// T e s ts for the creation of the b_vector.
+//  this only sees if ift all compiles.
 void test_b_vector(){
   triangulateio my_tio;
 
@@ -397,8 +433,16 @@ void test_b_vector(){
   VectorXd w_k, w_ij, w;
   w_k = w_k_builder(func_w, mesh_test, 2.5);
   VectorXd b = b_vector_builder(bound_mat_unordered, w_k);
+
+  print_status(1 ==1, "b_vector")
 }
 
+//-----------------------------------------------
+// T e s ts to see if the w vector is correctly
+//  correctly solved. This is done with the
+//  simple mesh and with a known solution. i.e.
+//  in the simple mesh is the unknown the average
+//  of all the points on the boundary.
 void test_w_solver(){
   triangulateio my_tio;
 
@@ -420,6 +464,11 @@ void test_w_solver(){
   print_status(w[4] == 1.0, "w_solver");
 }
 
+//-----------------------------------------------
+// Checks the energy solution with the same idea
+//  as the stiffness matrix, by eliminating the
+//  mass matrix and checking for the known
+//  solution.
 void test_energy_soln(){
   triangulateio my_tio;
 

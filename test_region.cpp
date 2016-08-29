@@ -21,19 +21,25 @@ namespace{
 
 }
 
+//-----------------------------------------------
+// T e s t mesh class on a larger scale. 30 nodes
+// 	vs couple thousand nodes.
 void test_region(){
 	tio *in;
 	tio *out;
 	tio *vor;
 
+	// Initial Conditions
 	double r = 5.;
 	double gamma = 1.;
 	double d = 4.;
 	double dd = .01;
 	double rho = 0.5;
 
+	// Storing I.C.
 	Mesh_Struct force(r, gamma, rho, d, dd);
 
+	// Mesh Construction
 	int num_points = 56 + num_circ(1.0) + num_circ(1.0);
 
 	in = malloc_pslg(num_points);
@@ -44,9 +50,11 @@ void test_region(){
 	triangulate(triswitches, in, out, vor);
 	Mesh m(out);
 
+	// Print for plotting purposes
 	fstream f("region_mesh.txt", fstream::out);
 	print_mesh( f, m);
 
+	// Reorder and Analyze
 	int center = 12;
 
 	SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
@@ -75,19 +83,24 @@ void test_region(){
 	print_status( 1==1, "Region");
 }
 
+//-----------------------------------------------
+// T e s t energy calculation on a larger scale
 void test_energy(){
 	tio *in;
 	tio *out;
 	tio *vor;
 
+	// Initial Conditions
 	double r = 5.;
 	double gamma = 1.;
 	double d = 4.;
 	double dd = .01;
 	double rho = 0.5;
 
+	// Storing I.C.
 	Mesh_Struct force(r, gamma, rho, d, dd);
 
+	// Build mesh
 	int num_points = 56 + num_circ(1.0) + num_circ(1.0);
 
 	in = malloc_pslg(num_points);
@@ -98,6 +111,7 @@ void test_energy(){
 	triangulate(triswitches, in, out, vor);
 	Mesh m(out);
 
+	// Reorder and Analyze
 	int center = 12;
 
 	SparseMatrix<double> not_bound_mat_ordered(m.num_points-m.num_edges, m.num_points-m.num_edges);
@@ -114,24 +128,33 @@ void test_energy(){
 	w_ij = matrix_solver(not_bound_mat_ordered, b);
 	w = w_stitcher(w_k, w_ij, m);
 
+	// Solve energy for the mesh
 	energy(m, w, gamma, rho);
 
 	print_status( 1==1, "energy");
 }
 
+//-----------------------------------------------
+// T e s t finding the force from the slope of
+// 	the energy vs distance plot.
 void test_force(){
 	tio *in;
 	tio *out;
 	tio *vor;
 
+	// Initial Conditions
 	double r = 5.;
 	double gamma = 1.;
 	double rho = 0.;
 	double d = 2.1;
 	double dd = .01;
 
+	// Storing I.C.
 	fstream energy_f("Energy_plot.txt", fstream::out);
 
+	// Creating multiple meshes at several distances
+	// 	-Storing the mesh
+	// 	-Storing the Energy
 	while(d<=10.0){
 		Mesh_Struct force(r, gamma, rho, d, dd);
 
